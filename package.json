@@ -13,7 +13,8 @@
     "test:e2e": "playwright test",
     "predev": "node scripts/copy-assets.mjs",
     "prebuild": "node scripts/copy-assets.mjs",
-    "pretest:e2e": "node scripts/copy-assets.mjs"
+    "pretest:e2e": "node scripts/copy-assets.mjs",
+    "start": "vite preview --host 0.0.0.0 --port ${PORT:-4173}"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.0",

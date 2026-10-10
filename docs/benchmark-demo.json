@@ -1,0 +1,512 @@
+{
+ "at": 1791602681909,
+ "queries": 48,
+ "frames": 14,
+ "modes": {
+  "clip": {
+   "recall1": 0.3958333333333333,
+   "recall5": 0.75,
+   "mrr": 0.5602260008510006,
+   "medianSearchMs": 25.550000000046566
+  },
+  "ocr": {
+   "recall1": 0.7083333333333334,
+   "recall5": 0.7083333333333334,
+   "mrr": 0.7083333333333334,
+   "medianSearchMs": 0.5
+  },
+  "fused": {
+   "recall1": 0.8958333333333334,
+   "recall5": 1,
+   "mrr": 0.9427083333333334,
+   "medianSearchMs": 25.600000000093132
+  }
+ },
+ "byKind": {
+  "text": {
+   "clip": {
+    "recall5": 0.6666666666666666,
+    "n": 33
+   },
+   "ocr": {
+    "recall5": 1,
+    "n": 33
+   },
+   "fused": {
+    "recall5": 1,
+    "n": 33
+   }
+  },
+  "visual": {
+   "clip": {
+    "recall5": 1,
+    "n": 13
+   },
+   "ocr": {
+    "recall5": 0,
+    "n": 13
+   },
+   "fused": {
+    "recall5": 1,
+    "n": 13
+   }
+  },
+  "mixed": {
+   "clip": {
+    "recall5": 0.5,
+    "n": 2
+   },
+   "ocr": {
+    "recall5": 0.5,
+    "n": 2
+   },
+   "fused": {
+    "recall5": 1,
+    "n": 2
+   }
+  }
+ },
+ "perQuery": [
+  {
+   "q": "typeerror cannot read properties of undefined",
+   "kind": "text",
+   "ranks": {
+    "clip": 1,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "calculateInvoiceTotal",
+   "kind": "text",
+   "ranks": {
+    "clip": 5,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "dark code editor with a red error in the terminal",
+   "kind": "visual",
+   "ranks": {
+    "clip": 1,
+    "ocr": null,
+    "fused": 1
+   }
+  },
+  {
+   "q": "npm test failed",
+   "kind": "text",
+   "ranks": {
+    "clip": 3,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "pro plan 29 dollars per month",
+   "kind": "text",
+   "ranks": {
+    "clip": 1,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "starter team pro billed monthly",
+   "kind": "text",
+   "ranks": {
+    "clip": 3,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "three pricing plan cards",
+   "kind": "visual",
+   "ranks": {
+    "clip": 2,
+    "ocr": null,
+    "fused": 2
+   }
+  },
+  {
+   "q": "cancel anytime",
+   "kind": "text",
+   "ranks": {
+    "clip": 1,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "red line chart going up",
+   "kind": "visual",
+   "ranks": {
+    "clip": 2,
+    "ocr": null,
+    "fused": 2
+   }
+  },
+  {
+   "q": "quarterly revenue dashboard",
+   "kind": "text",
+   "ranks": {
+    "clip": 2,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "churn 2.1%",
+   "kind": "text",
+   "ranks": {
+    "clip": 1,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "revenue chart",
+   "kind": "mixed",
+   "ranks": {
+    "clip": 1,
+    "ocr": null,
+    "fused": 1
+   }
+  },
+  {
+   "q": "q3 product roadmap",
+   "kind": "text",
+   "ranks": {
+    "clip": 1,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "presentation slide with big blue title",
+   "kind": "visual",
+   "ranks": {
+    "clip": 1,
+    "ocr": null,
+    "fused": 1
+   }
+  },
+  {
+   "q": "guided setup october 21",
+   "kind": "text",
+   "ranks": {
+    "clip": 9,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "beta with 200 customers",
+   "kind": "text",
+   "ranks": {
+    "clip": 9,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "launch party rooftop",
+   "kind": "text",
+   "ranks": {
+    "clip": 13,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "team chat app with messages",
+   "kind": "visual",
+   "ranks": {
+    "clip": 1,
+    "ocr": null,
+    "fused": 1
+   }
+  },
+  {
+   "q": "ship the new logo friday",
+   "kind": "text",
+   "ranks": {
+    "clip": 9,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "design-team channel",
+   "kind": "text",
+   "ranks": {
+    "clip": 9,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "flight to lisbon confirmed",
+   "kind": "text",
+   "ranks": {
+    "clip": 3,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "email inbox with a list of messages",
+   "kind": "visual",
+   "ranks": {
+    "clip": 1,
+    "ocr": null,
+    "fused": 1
+   }
+  },
+  {
+   "q": "dental appointment reminder",
+   "kind": "text",
+   "ranks": {
+    "clip": 3,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "sunday dinner lasagna",
+   "kind": "text",
+   "ranks": {
+    "clip": 6,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "secure checkout",
+   "kind": "text",
+   "ranks": {
+    "clip": 2,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "order total 84.98",
+   "kind": "text",
+   "ranks": {
+    "clip": 7,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "shipping 4.99 order summary",
+   "kind": "mixed",
+   "ranks": {
+    "clip": 7,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "route to golden gate park",
+   "kind": "text",
+   "ranks": {
+    "clip": 1,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "map with a blue route line",
+   "kind": "visual",
+   "ranks": {
+    "clip": 1,
+    "ocr": null,
+    "fused": 1
+   }
+  },
+  {
+   "q": "14 min via fulton st",
+   "kind": "text",
+   "ranks": {
+    "clip": 2,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "leather backpack",
+   "kind": "text",
+   "ranks": {
+    "clip": 2,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "deals of the day",
+   "kind": "text",
+   "ranks": {
+    "clip": 1,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "running shoes 96",
+   "kind": "text",
+   "ranks": {
+    "clip": 12,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "online store product grid with add to cart buttons",
+   "kind": "visual",
+   "ranks": {
+    "clip": 2,
+    "ocr": null,
+    "fused": 2
+   }
+  },
+  {
+   "q": "shipped my hackathon project",
+   "kind": "text",
+   "ranks": {
+    "clip": 7,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "social media feed with posts",
+   "kind": "visual",
+   "ranks": {
+    "clip": 1,
+    "ocr": null,
+    "fused": 1
+   }
+  },
+  {
+   "q": "typescript 7 is fast",
+   "kind": "text",
+   "ranks": {
+    "clip": 2,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "how volcanoes work",
+   "kind": "text",
+   "ranks": {
+    "clip": 1,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "video player with a red progress bar",
+   "kind": "visual",
+   "ranks": {
+    "clip": 1,
+    "ocr": null,
+    "fused": 1
+   }
+  },
+  {
+   "q": "science explained views",
+   "kind": "text",
+   "ranks": {
+    "clip": 5,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "sourdough hydration",
+   "kind": "text",
+   "ranks": {
+    "clip": 3,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "long text article",
+   "kind": "visual",
+   "ranks": {
+    "clip": 4,
+    "ocr": null,
+    "fused": 4
+   }
+  },
+  {
+   "q": "keep the starter fed",
+   "kind": "text",
+   "ranks": {
+    "clip": 11,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "settings page with toggles",
+   "kind": "visual",
+   "ranks": {
+    "clip": 1,
+    "ocr": null,
+    "fused": 1
+   }
+  },
+  {
+   "q": "location services",
+   "kind": "text",
+   "ranks": {
+    "clip": 5,
+    "ocr": 1,
+    "fused": 1
+   }
+  },
+  {
+   "q": "q3 budget marketing actual",
+   "kind": "text",
+   "ranks": {
+    "clip": 12,
+    "ocr": 1,
+    "fused": 2
+   }
+  },
+  {
+   "q": "spreadsheet table of numbers",
+   "kind": "visual",
+   "ranks": {
+    "clip": 1,
+    "ocr": null,
+    "fused": 1
+   }
+  },
+  {
+   "q": "travel 8,120",
+   "kind": "text",
+   "ranks": {
+    "clip": 1,
+    "ocr": 1,
+    "fused": 1
+   }
+  }
+ ],
+ "pipeline": {
+  "medianIndexMs": 672.1000000000349,
+  "keptVsCaptured": "14 / 15",
+  "mbPerHourKept": 24.012,
+  "modelLoadMs": 11432,
+  "backend": "wasm"
+ },
+ "activityAccuracy": 0.8571428571428571,
+ "networkRequestsAfterLoad": 0
+}

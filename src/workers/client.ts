@@ -1,6 +1,7 @@
 import { RpcClient } from '../util/rpc';
 import type { ProcessArgs } from './index.worker';
 import type { ModelProgress, NetEntry } from '../types';
+import { setKv } from '../store/db';
 
 export type IndexResult =
   | { status: 'stored'; frameId: string; bytes: number; indexMs: number; redactions: number }
@@ -37,7 +38,15 @@ export class IndexClient {
     const w = new Worker(new URL('./index.worker.ts', import.meta.url), { type: 'module', name: 'flatpak-index' });
     this.worker = w;
     this.rpc = new RpcClient(w, (type, payload) => {
-      if (type === 'models') this.emit({ type: 'models', ...(payload as object) } as IndexEvent);
+      if (type === 'models') {
+        const p = payload as { state: string; loadMs?: number; backend?: string };
+        if (p.state === 'ready') {
+          void setKv('models-ready-at', Date.now());
+          if (p.loadMs) void setKv('model-load-ms', Math.round(p.loadMs));
+          if (p.backend) void setKv('model-backend', p.backend);
+        }
+        this.emit({ type: 'models', ...(payload as object) } as IndexEvent);
+      }
       else if (type === 'progress') this.emit({ type: 'progress', progress: payload as ModelProgress });
       else if (type === 'net') this.emit({ type: 'net', entries: payload as NetEntry[] });
     });
@@ -58,7 +67,7 @@ export class IndexClient {
   /** Spawn (once) and warm the models. */
   start(): Promise<void> {
     if (!this.worker) this.spawn();
-    this.ready ??= this.rpc!.call('init').then(() => undefined).catch((e) => {
+    this.ready ??= this.rpc!.call('init', { baseUrl: new URL('./', document.baseURI).href }).then(() => undefined).catch((e) => {
       this.ready = null;
       throw e;
     });
@@ -73,6 +82,11 @@ export class IndexClient {
     } finally {
       this.inflight = Math.max(0, this.inflight - 1);
     }
+  }
+
+  async embedText(q: string): Promise<Float32Array> {
+    await this.start();
+    return this.rpc!.call<Float32Array>('embedText', { q });
   }
 
   call<T>(method: string, args?: unknown): Promise<T> {

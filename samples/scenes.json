@@ -1,0 +1,79 @@
+[
+ {
+  "id": "code",
+  "title": "Code editor with stack trace",
+  "activity": "coding"
+ },
+ {
+  "id": "pricing",
+  "title": "Pricing table",
+  "activity": "shopping"
+ },
+ {
+  "id": "dashboard",
+  "title": "Revenue dashboard with red line chart",
+  "activity": "other"
+ },
+ {
+  "id": "slides",
+  "title": "Presentation slide",
+  "activity": "slides"
+ },
+ {
+  "id": "chat",
+  "title": "Team chat",
+  "activity": "chat"
+ },
+ {
+  "id": "email",
+  "title": "Email inbox",
+  "activity": "email"
+ },
+ {
+  "id": "checkout",
+  "title": "Checkout page with sensitive data",
+  "activity": "shopping",
+  "sensitive": true
+ },
+ {
+  "id": "maps",
+  "title": "Map with route",
+  "activity": "maps"
+ },
+ {
+  "id": "shopping",
+  "title": "Product grid",
+  "activity": "shopping"
+ },
+ {
+  "id": "social",
+  "title": "Social feed",
+  "activity": "social"
+ },
+ {
+  "id": "video",
+  "title": "Video player",
+  "activity": "video"
+ },
+ {
+  "id": "doc",
+  "title": "Article",
+  "activity": "documents"
+ },
+ {
+  "id": "terminal",
+  "title": "Terminal with recovery phrase",
+  "activity": "coding",
+  "blocklisted": true
+ },
+ {
+  "id": "settings",
+  "title": "Settings page",
+  "activity": "other"
+ },
+ {
+  "id": "spreadsheet",
+  "title": "Spreadsheet",
+  "activity": "documents"
+ }
+]

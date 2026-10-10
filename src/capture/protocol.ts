@@ -1,6 +1,7 @@
 export interface CaptureStartMsg {
   type: 'start';
-  track: MediaStreamTrack;
+  /** MediaStreamTrackProcessor.readable created on the main thread: streams are transferable, tracks are not (in stable Chrome). */
+  readable: ReadableStream<VideoFrame>;
   intervalMs: number;
   dedupeThreshold: number;
   gridThreshold: number;

@@ -87,14 +87,15 @@ export function newSessionId(): string {
   return `s${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 }
 
-export async function createSession(label?: string): Promise<SessionRec> {
-  const startedAt = Date.now();
+export async function createSession(label?: string, at?: number, demo?: boolean): Promise<SessionRec> {
+  const startedAt = at ?? Date.now();
   const rec: SessionRec = {
     id: newSessionId(),
     startedAt,
     endedAt: null,
     label: label ?? new Date(startedAt).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
     counters: emptyCounters(),
+    ...(demo ? { demo: true } : {}),
   };
   await (await db()).put('sessions', rec);
   return rec;

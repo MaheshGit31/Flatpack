@@ -8,6 +8,6 @@ export default defineConfig({
   optimizeDeps: { exclude: ['@huggingface/transformers', 'onnxruntime-web'] },
   build: { target: 'es2022', sourcemap: false, chunkSizeWarningLimit: 4000 },
   server: { port: 5173, host: true },
-  preview: { port: 4173, host: true },
+  preview: { port: 4173, host: true, allowedHosts: true },
   test: { environment: 'node', include: ['tests/**/*.test.ts'] },
 });

@@ -74,9 +74,9 @@ async function handleSource(src: VideoFrame | ImageBitmap, w: number, h: number)
   postStats();
 }
 
-async function runProcessor(track: MediaStreamTrack): Promise<void> {
+async function runProcessor(readable: ReadableStream<VideoFrame>): Promise<void> {
   send({ type: 'mode', mode: 'processor' });
-  const reader = new MediaStreamTrackProcessor({ track }).readable.getReader();
+  const reader = readable.getReader();
   try {
     for (;;) {
       const { value: frame, done } = await reader.read();
@@ -93,8 +93,7 @@ async function runProcessor(track: MediaStreamTrack): Promise<void> {
       }
     }
   } finally {
-    reader.releaseLock();
-    track.stop();
+    await reader.cancel().catch(() => undefined);
     send({ type: 'ended' });
   }
 }
@@ -104,7 +103,7 @@ ctx.onmessage = (e) => {
   switch (m.type) {
     case 'start':
       ({ intervalMs, dedupeThreshold, gridThreshold, startWall, maxWidth } = m);
-      runProcessor(m.track).catch((err: unknown) => send({ type: 'error', message: err instanceof Error ? err.message : String(err) }));
+      runProcessor(m.readable).catch((err: unknown) => send({ type: 'error', message: err instanceof Error ? err.message : String(err) }));
       break;
     case 'init-fallback':
       ({ intervalMs, dedupeThreshold, gridThreshold, startWall, maxWidth } = m);

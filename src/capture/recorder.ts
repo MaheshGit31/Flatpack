@@ -4,6 +4,8 @@ import { indexClient } from '../workers/client';
 import type { SessionCounters, SessionRec, Settings } from '../types';
 import type { CaptureIn, CaptureOut, CaptureStats } from './protocol';
 import { FallbackSampler } from './fallback';
+import { AudioTap } from '../audio/tap';
+import { audioClient } from '../workers/audioClient';
 
 export type RecPhase = 'idle' | 'starting' | 'recording' | 'paused' | 'stopping';
 
@@ -16,6 +18,8 @@ export interface LiveStats extends SessionCounters {
   mode: 'processor' | 'fallback' | '-';
   redactions: number;
   workerRestarts: number;
+  transcribed: number;
+  audioPending: number;
 }
 
 export interface RecorderState {
@@ -30,7 +34,7 @@ export interface RecorderState {
 const MAX_QUEUE = 12; // frames in flight to the indexer; beyond this we drop (never store unredacted)
 const CAPTURE_ONLY_AT = 4;
 
-const zeroStats = (): LiveStats => ({ ...emptyCounters(), indexed: 0, bytes: 0, queue: 0, maxGapMs: 0, captureOnly: false, mode: '-', redactions: 0, workerRestarts: 0 });
+const zeroStats = (): LiveStats => ({ ...emptyCounters(), indexed: 0, bytes: 0, queue: 0, maxGapMs: 0, captureOnly: false, mode: '-', redactions: 0, workerRestarts: 0, transcribed: 0, audioPending: 0 });
 
 export function browserSupport(): { ok: boolean; reasons: string[] } {
   const reasons: string[] = [];
@@ -54,6 +58,9 @@ export class Recorder {
   private lastCapture: CaptureStats = { captured: 0, candidates: 0, skippedDup: 0, skippedBlack: 0, maxGapMs: 0 };
   private base: SessionCounters = emptyCounters();
   private tapped: ((s: MediaStream) => void) | null = null;
+  private taps: AudioTap[] = [];
+  private micStream: MediaStream | null = null;
+  private audioOff: (() => void) | null = null;
 
   subscribe = (fn: () => void): (() => void) => {
     this.listeners.add(fn);
@@ -80,7 +87,7 @@ export class Recorder {
     this.set({ stats: { ...this.state.stats, ...patch } });
   }
 
-  async start(opts: { systemAudio?: boolean } = {}): Promise<void> {
+  async start(opts: { systemAudio?: boolean; mic?: boolean } = {}): Promise<void> {
     if (this.state.phase !== 'idle') return;
     this.set({ phase: 'starting', error: null });
     let stream: MediaStream;
@@ -91,6 +98,16 @@ export class Recorder {
       this.set({ phase: 'idle', error: name === 'NotAllowedError' ? 'Screen sharing was cancelled or denied. Nothing was recorded.' : `Could not start capture: ${e instanceof Error ? e.message : String(e)}` });
       return;
     }
+    let mic: MediaStream | null = null;
+    if (opts.mic) {
+      try {
+        mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      } catch (e) {
+        for (const t of stream.getTracks()) t.stop();
+        this.set({ phase: 'idle', error: e instanceof DOMException && e.name === 'NotAllowedError' ? 'Microphone permission was denied. Nothing was recorded.' : `Could not open the microphone: ${e instanceof Error ? e.message : String(e)}` });
+        return;
+      }
+    }
     try {
       this.settings = await getSettings();
       const session = await createSession();
@@ -99,18 +116,44 @@ export class Recorder {
       this.base = emptyCounters();
       this.lastCapture = { captured: 0, candidates: 0, skippedDup: 0, skippedBlack: 0, maxGapMs: 0 };
       this.stream = stream;
-      this.set({ session, stats: zeroStats(), audioTracks: stream.getAudioTracks().length });
+      this.set({ session, stats: zeroStats(), audioTracks: stream.getAudioTracks().length + (mic ? 1 : 0) });
       void indexClient().start().catch(() => undefined);
       const video = stream.getVideoTracks()[0];
       if (!video) throw new Error('no video track in the shared stream');
       video.addEventListener('ended', () => void this.stop());
       this.startCapture(video);
       this.tapped?.(stream);
+      this.micStream = mic;
+      await this.startAudio(session.id, stream, mic);
       this.tick = window.setInterval(() => this.onTick(), 1000);
       this.set({ phase: 'recording' });
     } catch (e) {
       for (const t of stream.getTracks()) t.stop();
+      for (const t of mic?.getTracks() ?? []) t.stop();
       this.set({ phase: 'idle', error: e instanceof Error ? e.message : String(e) });
+    }
+  }
+
+  private async startAudio(sessionId: string, display: MediaStream, mic: MediaStream | null): Promise<void> {
+    const sources: ['tab' | 'mic', MediaStream][] = [];
+    if (display.getAudioTracks().length) sources.push(['tab', new MediaStream(display.getAudioTracks())]);
+    if (mic) sources.push(['mic', mic]);
+    if (!sources.length) return;
+    const ac = audioClient();
+    this.audioOff = ac.on((e) => {
+      if (e.type === 'transcribed') this.setStats({ transcribed: e.count });
+      else if (e.type === 'audio-queue') this.setStats({ audioPending: e.pending });
+      else if (e.type === 'audio-model' && e.state === 'error') this.set({ error: 'Speech model failed to load: ' + (e.message ?? 'unknown error') + '. Screen capture continues.' });
+    });
+    await ac.begin(sessionId);
+    void ac.init().catch(() => undefined); // model download happens in the background; chunks queue until it is ready
+    for (const [source, st] of sources) {
+      const tap = new AudioTap(st, (samples, wallEnd) => {
+        if (this.clock?.paused) return;
+        const dur = (samples.length / 16000) * 1000;
+        ac.pcm(source, samples, Math.max(0, wallEnd - this.clock!.startWall - dur));
+      });
+      try { await tap.start(); this.taps.push(tap); } catch (e) { this.set({ error: `Audio capture failed: ${e instanceof Error ? e.message : String(e)}` }); }
     }
   }
 
@@ -118,19 +161,18 @@ export class Recorder {
     const s = this.settings!;
     const clock = this.clock!;
     const sid = this.state.session!.id;
-    const startMsg: CaptureIn = { type: 'start', track: video.clone(), intervalMs: s.intervalMs, dedupeThreshold: s.dedupeThreshold, gridThreshold: s.gridThreshold, startWall: clock.startWall, maxWidth: 1280 };
     const worker = new Worker(new URL('./capture.worker.ts', import.meta.url), { type: 'module', name: 'flatpak-capture' });
     this.worker = worker;
     worker.onmessage = (e: MessageEvent<CaptureOut>) => this.onWorker(e.data, sid);
     worker.onerror = () => this.restartCapture(video);
-    const canProcess = typeof MediaStreamTrackProcessor !== 'undefined';
-    if (canProcess) {
+    if (typeof MediaStreamTrackProcessor !== 'undefined') {
       try {
-        const t = (startMsg as Extract<CaptureIn, { type: 'start' }>).track;
-        worker.postMessage(startMsg, [t]);
+        const readable = new MediaStreamTrackProcessor({ track: video.clone(), maxBufferSize: 2 }).readable;
+        const startMsg: CaptureIn = { type: 'start', readable, intervalMs: s.intervalMs, dedupeThreshold: s.dedupeThreshold, gridThreshold: s.gridThreshold, startWall: clock.startWall, maxWidth: 1280 };
+        worker.postMessage(startMsg, [readable]);
         return;
       } catch {
-        /* DataCloneError: track not transferable here, use the fallback */
+        /* DataCloneError or unsupported: use the fallback sampler */
       }
     }
     worker.postMessage({ type: 'init-fallback', startWall: clock.startWall, intervalMs: s.intervalMs, dedupeThreshold: s.dedupeThreshold, gridThreshold: s.gridThreshold, maxWidth: 1280 } satisfies CaptureIn);
@@ -211,6 +253,7 @@ export class Recorder {
     this.clock?.pause();
     this.worker?.postMessage({ type: 'pause' } satisfies CaptureIn);
     for (const t of this.stream?.getAudioTracks() ?? []) t.enabled = false;
+    for (const t of this.micStream?.getAudioTracks() ?? []) t.enabled = false;
     this.set({ phase: 'paused' });
   }
   resume(): void {
@@ -218,6 +261,7 @@ export class Recorder {
     this.clock?.resume();
     this.worker?.postMessage({ type: 'resume' } satisfies CaptureIn);
     for (const t of this.stream?.getAudioTracks() ?? []) t.enabled = true;
+    for (const t of this.micStream?.getAudioTracks() ?? []) t.enabled = true;
     this.set({ phase: 'recording' });
   }
   toggle(): void {
@@ -238,6 +282,15 @@ export class Recorder {
     for (const t of this.stream?.getTracks() ?? []) t.stop();
     this.stream = null;
     this.tapped?.(new MediaStream());
+    if (this.taps.length) {
+      await Promise.all(this.taps.map((t) => t.stop()));
+      this.taps = [];
+      for (const t of this.micStream?.getTracks() ?? []) t.stop();
+      this.micStream = null;
+      try { await audioClient().end(); } catch { /* transcription is best-effort */ }
+      this.audioOff?.();
+      this.audioOff = null;
+    }
     await this.persistCounters();
     const s = this.state.session;
     if (s) await updateSession(s.id, { endedAt: Date.now() });

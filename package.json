@@ -1,0 +1,27 @@
+{
+  "name": "flatpack",
+  "version": "1.0.0",
+  "description": "FLATPACK - instructions shouldn't need a language.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "make-character": "node scripts/make-character.js",
+    "make-demos": "node scripts/make-demos.js",
+    "test": "node scripts/e2e.js"
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "compression": "^1.8.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "multer": "^1.4.5-lts.1",
+    "pdf-lib": "^1.17.1",
+    "sharp": "^0.33.5"
+  }
+}

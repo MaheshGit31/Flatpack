@@ -1,0 +1,105 @@
+{
+  "id": "demo-gadget",
+  "createdAt": "2026-10-10T01:31:02.496Z",
+  "hint": "boxed gadget, how do I set it up",
+  "status": "done",
+  "subject": "boxed gadget, how do I set it up",
+  "goal": "understand and use: boxed gadget, how do I set it up",
+  "audience_note": "first-time user, may not read the local language",
+  "safety_category": "none",
+  "plan": [
+    {
+      "n": 1,
+      "action": "open the box lid",
+      "panel_spec": "wide shot, character lifts the lid with both hands, arrow 1 pointing up",
+      "check": "the lid is shown open and lifted",
+      "is_warning": false
+    },
+    {
+      "n": 2,
+      "action": "take the item out",
+      "panel_spec": "close-up, one hand lifts the item out of the box, arrow 2 upward",
+      "check": "a hand is lifting the item out of the box",
+      "is_warning": false
+    },
+    {
+      "n": 3,
+      "action": "do not pull the cable hard",
+      "panel_spec": "character tugs the cable, big red X over the cable",
+      "check": "a red X is shown over a pulled cable",
+      "is_warning": true
+    },
+    {
+      "n": 4,
+      "action": "plug the cable in",
+      "panel_spec": "close-up, hand pushes the plug into the socket, arrow 3 toward the socket",
+      "check": "a plug is being inserted into a socket",
+      "is_warning": false
+    },
+    {
+      "n": 5,
+      "action": "press the power button once",
+      "panel_spec": "close-up, finger presses a round button, small clock symbol",
+      "check": "a finger presses a single round button",
+      "is_warning": false
+    }
+  ],
+  "panels": {
+    "1": {
+      "file": "panel-1-r0.png",
+      "mime": "image/png",
+      "status": "ok",
+      "rev": 0,
+      "critic": {
+        "passed": true,
+        "retried": false
+      },
+      "error": null
+    },
+    "2": {
+      "file": "panel-2-r1.png",
+      "mime": "image/png",
+      "status": "ok",
+      "rev": 1,
+      "critic": {
+        "passed": true,
+        "retried": true
+      },
+      "error": null
+    },
+    "3": {
+      "file": "panel-3-r0.png",
+      "mime": "image/png",
+      "status": "ok",
+      "rev": 0,
+      "critic": {
+        "passed": true,
+        "retried": false
+      },
+      "error": null
+    },
+    "4": {
+      "file": "panel-4-r0.png",
+      "mime": "image/png",
+      "status": "ok",
+      "rev": 0,
+      "critic": {
+        "passed": true,
+        "retried": false
+      },
+      "error": null
+    },
+    "5": {
+      "file": "panel-5-r0.png",
+      "mime": "image/png",
+      "status": "ok",
+      "rev": 0,
+      "critic": {
+        "passed": true,
+        "retried": false
+      },
+      "error": null
+    }
+  },
+  "title": "Setting up a boxed gadget"
+}

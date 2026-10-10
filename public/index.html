@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FLATPACK - instructions shouldn't need a language</title>
+<meta name="description" content="Photograph anything confusing. Get a wordless, step-by-step guide anyone can follow. Works without reading, in any language.">
+<meta name="theme-color" content="#ffffff">
+<link rel="canonical" href="__ORIGIN__/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FLATPACK">
+<meta property="og:title" content="FLATPACK - instructions shouldn't need a language">
+<meta property="og:description" content="Photograph anything confusing. Get a wordless, step-by-step guide anyone can follow.">
+<meta property="og:url" content="__ORIGIN__/">
+<meta property="og:image" content="__OG__">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FLATPACK - instructions shouldn't need a language">
+<meta name="twitter:description" content="Photograph anything confusing. Get a wordless, step-by-step guide anyone can follow.">
+<meta name="twitter:image" content="__OG__">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23fff'/%3E%3Cg fill='%23fff' stroke='%23111' stroke-width='2.2' stroke-linejoin='round' stroke-linecap='round'%3E%3Ccircle cx='20' cy='11' r='7'/%3E%3Cpath d='M12 19h16l2 11H10zM15 30v8M25 30v8'/%3E%3C/g%3E%3Ccircle cx='17.5' cy='10' r='1' fill='%23111'/%3E%3Ccircle cx='22.5' cy='10' r='1' fill='%23111'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/site.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+
+<!-- mascot: the bald manual guy -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="guy" viewBox="0 0 100 200">
+      <g fill="#fff" stroke="#111" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M32 64 L18 78 L26 90 L35 82 L36 124 H64 L65 82 L74 90 L82 78 L68 64 Z"/>
+        <circle cx="50" cy="34" r="24"/>
+        <path d="M24 90 L17 120 M76 90 L83 120"/>
+        <path d="M36 124 H64 L66 188 H52 L50 142 L48 188 H34 Z"/>
+      </g>
+      <circle cx="42" cy="31" r="2.8" fill="#111"/><circle cx="58" cy="31" r="2.8" fill="#111"/>
+      <path d="M43 43 q7 5 14 0" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="guy-point" viewBox="0 0 120 200">
+      <g fill="#fff" stroke="#111" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M32 64 L18 78 L26 90 L35 82 L36 124 H64 L65 82 L74 90 L82 78 L68 64 Z"/>
+        <circle cx="50" cy="34" r="24"/>
+        <path d="M24 90 L17 120 M76 88 L108 62"/>
+        <path d="M36 124 H64 L66 188 H52 L50 142 L48 188 H34 Z"/>
+      </g>
+      <circle cx="42" cy="31" r="2.8" fill="#111"/><circle cx="58" cy="31" r="2.8" fill="#111"/>
+      <path d="M43 43 q7 5 14 0" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 Z" fill="#111"/></marker>
+    <marker id="ahr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 Z" fill="#E10600"/></marker>
+  </defs>
+</svg>
+
+<a class="skip" href="#try">Skip to the tool</a>
+
+<!-- 1. NAV -->
+<header class="nav" id="nav">
+  <div class="nav-in">
+    <a class="logo" href="#top" aria-label="FLATPACK, back to top"><span class="logo-box">FLATPACK</span><i class="logo-dot"></i></a>
+    <nav class="links" aria-label="Sections">
+      <a href="#how" data-sec="how">How it works</a>
+      <a href="#try" data-sec="try">Try it</a>
+      <a href="#examples" data-sec="examples">Examples</a>
+      <a href="#why" data-sec="why">Why</a>
+    </nav>
+    <a class="btn red" href="#try">Try it</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- 2. HERO -->
+<section class="hero" aria-labelledby="h-hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="kicker"><span class="mark sm">0</span> a wordless instruction manual for anything</p>
+      <h1 id="h-hero">Instructions shouldn't need a <span class="red">language.</span></h1>
+      <p class="lede">Photograph anything confusing. Get a wordless, step-by-step guide anyone can follow.</p>
+      <div class="cta">
+        <a class="btn red big" href="#try">Try it now</a>
+        <a class="btn ghost big" href="#examples">See examples</a>
+      </div>
+    </div>
+    <div class="hero-demo" aria-hidden="true">
+      <svg class="guy hero-guy" viewBox="0 0 120 200"><use href="#guy-point"/></svg>
+      <div class="loop" id="loop"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. HOW IT WORKS -->
+<section class="sec" id="how" aria-labelledby="h-how">
+  <div class="wrap">
+    <h2 id="h-how" class="reveal"><span class="mark">1</span> How it works</h2>
+    <ol class="steps">
+      <li class="step reveal">
+        <div class="art"><svg viewBox="0 0 120 120" fill="none" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 38h20l7-11h38l7 11h20v62H14z"/><circle cx="60" cy="68" r="19"/><circle cx="60" cy="68" r="8"/></svg></div>
+        <span class="mark">1</span><h3>Snap it</h3><p>Point your phone at the form, the gadget, the pill box, the broken thing.</p>
+      </li>
+      <li class="arrow" aria-hidden="true"><svg viewBox="0 0 120 40"><path d="M4 20 C 40 -4, 80 44, 112 20" fill="none" stroke="#111" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" marker-end="url(#ah)"/></svg></li>
+      <li class="step reveal">
+        <div class="art"><svg viewBox="0 0 120 120" fill="none" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="52" cy="52" r="26"/><path d="M72 72l26 26"/><path d="M42 52l8 8 14-16" stroke="#E10600"/></svg></div>
+        <span class="mark">2</span><h3>We figure it out</h3><p>We read it, plan the steps, draw each one, then check every drawing for mistakes.</p>
+      </li>
+      <li class="arrow" aria-hidden="true"><svg viewBox="0 0 120 40"><path d="M4 20 C 40 -4, 80 44, 112 20" fill="none" stroke="#111" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" marker-end="url(#ah)"/></svg></li>
+      <li class="step reveal">
+        <div class="art"><svg viewBox="0 0 120 120" fill="none" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="12" y="16" width="44" height="44"/><rect x="64" y="16" width="44" height="44"/><rect x="12" y="68" width="44" height="44"/><rect x="64" y="68" width="44" height="44" stroke="#E10600"/><path d="M76 80l20 20M96 80L76 100" stroke="#E10600"/></svg></div>
+        <span class="mark">3</span><h3>Follow the pictures</h3><p>Numbered panels, one action each. No words. Print it or send a link.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<div class="divider" aria-hidden="true"><svg viewBox="0 0 40 90"><path d="M20 4 V76" fill="none" stroke="#111" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" marker-end="url(#ah)"/></svg></div>
+
+<!-- 4. TRY IT -->
+<section class="sec" id="try" aria-labelledby="h-try">
+  <div class="wrap">
+    <h2 id="h-try" class="reveal"><span class="mark">2</span> Try it</h2>
+    <p class="mockbanner" id="mockBanner" hidden>Mock mode: no API key is set, so panels are placeholders.</p>
+
+    <div class="tool reveal" id="tool">
+      <form id="form" autocomplete="off">
+        <label class="drop" id="drop" for="photo">
+          <input id="photo" name="photo" type="file" accept="image/*" capture="environment">
+          <span class="cam" aria-hidden="true"><svg viewBox="0 0 64 64" width="52" height="52" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20h12l4-6h16l4 6h12v32H8z"/><circle cx="32" cy="35" r="10"/></svg></span>
+          <span class="drop-main" id="dropMain">Take a photo</span>
+          <span class="drop-sub" id="dropSub">or drop an image here, or choose one</span>
+          <img id="preview" alt="Your photo" hidden>
+        </label>
+        <label class="field" for="hint"><span>What do you need to do? <em>(optional)</em></span>
+          <input id="hint" name="hint" type="text" maxlength="300" placeholder="e.g. set this up, fill this in, take these pills">
+        </label>
+        <button class="btn red big go" id="go" type="submit" disabled>Make my guide</button>
+      </form>
+
+      <div class="examples-row">
+        <span>No photo handy? Try an example:</span>
+        <span class="chips" id="demoRow">
+          <button class="chip" data-demo="pill" type="button">pill schedule</button>
+          <button class="chip" data-demo="gadget" type="button">boxed gadget</button>
+          <button class="chip" data-demo="form" type="button">paper form</button>
+        </span>
+      </div>
+
+      <div class="out" id="out" hidden aria-live="polite">
+        <div class="out-head">
+          <h3 id="subject"></h3>
+          <p class="status" id="status"></p>
+        </div>
+        <div class="clarify" id="clarify" hidden>
+          <p id="clarifyQ"></p>
+          <form id="clarifyForm"><input id="clarifyA" type="text" maxlength="200" placeholder="your answer" aria-label="your answer" required><button class="btn" type="submit">Go</button></form>
+        </div>
+        <ol class="grid" id="grid"></ol>
+        <div class="disclaimer" id="disclaimer" hidden><b class="bang">!</b><p>Visual aid only.<br>Not professional advice.</p></div>
+        <div class="out-actions" id="outActions" hidden>
+          <a class="btn" id="pdfBtn" href="#" download>Download PDF</a>
+          <button class="btn ghost" id="shareBtn" type="button">Copy share link</button>
+          <a class="btn ghost" id="openBtn" href="#">Open guide page</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" aria-hidden="true"><svg viewBox="0 0 40 90"><path d="M20 4 V76" fill="none" stroke="#111" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" marker-end="url(#ah)"/></svg></div>
+
+<!-- 5. EXAMPLES -->
+<section class="sec" id="examples" aria-labelledby="h-ex">
+  <div class="wrap">
+    <h2 id="h-ex" class="reveal"><span class="mark">3</span> Examples</h2>
+    <p class="sublede reveal">Real guides, made from a single photo each. Tap one to open it.</p>
+    <div class="gallery" id="gallery"><p class="muted">loading examples...</p></div>
+  </div>
+</section>
+
+<div class="divider" aria-hidden="true"><svg viewBox="0 0 40 90"><path d="M20 4 V76" fill="none" stroke="#111" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" marker-end="url(#ah)"/></svg></div>
+
+<!-- 6. WHY -->
+<section class="sec" id="why" aria-labelledby="h-why">
+  <div class="wrap">
+    <h2 id="h-why" class="reveal"><span class="mark">4</span> Why it matters</h2>
+    <div class="cards">
+      <article class="card reveal"><svg class="icon" viewBox="0 0 64 64" fill="none" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="10" y="12" width="44" height="40"/><path d="M18 24h28M18 34h28M18 44h14"/><path d="M6 58L58 6" stroke="#E10600"/></svg><h3>Works without reading</h3><p>A picture of a hand pressing a button needs no vocabulary. Nobody has to decode a paragraph to take their medicine.</p></article>
+      <article class="card reveal"><svg class="icon" viewBox="0 0 64 64" fill="none" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="32" cy="32" r="24"/><path d="M8 32h48M32 8c-14 14-14 34 0 48M32 8c14 14 14 34 0 48"/></svg><h3>Works in any language</h3><p>The same guide is right in every country. Hand it over, no translation, no app, no account.</p></article>
+      <article class="card reveal"><svg class="icon" viewBox="0 0 64 64" fill="none" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="32" cy="32" r="24"/><path d="M32 18v16l10 6"/></svg><h3>Works when you're overwhelmed</h3><p>One action per panel. Short, calm, in order. Exactly what a stressed brain can follow.</p></article>
+    </div>
+    <p class="helps reveal"><svg class="guy" viewBox="0 0 100 200" aria-hidden="true"><use href="#guy"/></svg><span>Made for <b>kids</b>, <b>people with low literacy</b>, <b>people new to a country</b>, and <b>anyone stressed</b> at a form, a medicine, or a box of parts.</span></p>
+  </div>
+</section>
+
+<div class="divider" aria-hidden="true"><svg viewBox="0 0 40 90"><path d="M20 4 V76" fill="none" stroke="#111" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" marker-end="url(#ah)"/></svg></div>
+
+<!-- 7. HOW IT'S BUILT -->
+<section class="sec" id="built" aria-labelledby="h-built">
+  <div class="wrap">
+    <h2 id="h-built" class="reveal"><span class="mark">5</span> How it's built</h2>
+    <ol class="pipe reveal" aria-label="Pipeline: Read, Plan, Draw, Check">
+      <li><b>Read</b><span>vision model reads the photo</span></li>
+      <li class="pa" aria-hidden="true"><svg viewBox="0 0 40 20"><path d="M2 10H32" stroke="#111" stroke-width="3" stroke-dasharray="2 6" stroke-linecap="round" marker-end="url(#ah)"/></svg></li>
+      <li><b>Plan</b><span>4 to 8 steps, one action each</span></li>
+      <li class="pa" aria-hidden="true"><svg viewBox="0 0 40 20"><path d="M2 10H32" stroke="#111" stroke-width="3" stroke-dasharray="2 6" stroke-linecap="round" marker-end="url(#ah)"/></svg></li>
+      <li><b>Draw</b><span>Nano Banana, in parallel</span></li>
+      <li class="pa" aria-hidden="true"><svg viewBox="0 0 40 20"><path d="M2 10H32" stroke="#111" stroke-width="3" stroke-dasharray="2 6" stroke-linecap="round" marker-end="url(#ah)"/></svg></li>
+      <li class="chk"><b>Check</b><span>a second pass inspects every panel</span></li>
+    </ol>
+    <p class="loopnote reveal"><svg viewBox="0 0 60 34" aria-hidden="true"><path d="M52 6 C 58 32, 8 34, 8 12" fill="none" stroke="#E10600" stroke-width="3" stroke-dasharray="2 6" stroke-linecap="round" marker-end="url(#ahr)"/></svg>The critic loop: each panel is checked for the step it claims, stray text, and a drifting character. Failures are redrawn once. Tap "this isn't what I see" and only the affected steps are redrawn.</p>
+  </div>
+</section>
+
+</main>
+
+<!-- 8. FOOTER -->
+<footer class="foot">
+  <div class="wrap foot-in">
+    <a class="logo" href="#top" aria-label="FLATPACK, back to top"><span class="logo-box">FLATPACK</span><i class="logo-dot"></i></a>
+    <p>Made for Banana AI Hacks 2026.</p>
+    <p class="fine">Visual aid only. Not professional advice. For anything medical, legal or dangerous, ask a professional.</p>
+    <p><a href="__GITHUB__" rel="noopener" id="gh">GitHub</a></p>
+  </div>
+</footer>
+
+<dialog id="fixDlg" aria-labelledby="fixTitle">
+  <form method="dialog" id="fixForm">
+    <h3 id="fixTitle">What do you see instead?</h3>
+    <p class="fine">Add a photo of what actually happened, or a short note. Only the affected steps get redrawn.</p>
+    <label class="btn ghost filebtn" for="fixPhoto" id="fixPhotoLbl"><span>Add photo</span><input id="fixPhoto" type="file" accept="image/*" capture="environment"></label>
+    <input id="fixNote" type="text" maxlength="300" placeholder="short note (optional if photo)" aria-label="short note">
+    <div class="dlg-actions"><button class="btn ghost" type="button" id="fixCancel">Cancel</button><button class="btn red" id="fixSend" type="submit">Redraw</button></div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+<script src="/site.js" defer></script>
+</body>
+</html>

@@ -6,7 +6,7 @@
   "description": "Flatpak: screen memory. Stays on your device.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "node scripts/copy-assets.mjs && tsc --noEmit && vite build",
     "preview": "vite preview --port 4173",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

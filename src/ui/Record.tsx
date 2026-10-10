@@ -20,7 +20,7 @@ export function Record() {
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const file = useRef<HTMLInputElement>(null);
-  const doDemo = async () => { setBusy(true); setNote('Loading demo sessions…'); try { const r = await loadDemo(); setNote(`Loaded ${r.frames} frames in ${r.sessions} demo sessions. Try the Search tab.`); } catch (e) { setNote('Demo failed: ' + (e instanceof Error ? e.message : String(e))); } finally { setBusy(false); } };
+  const doDemo = async () => { setBusy(true); setNote('Loading demo sessions…'); try { const r = await loadDemo(); setNote(`Loaded ${r.frames} frames in ${r.sessions} demo sessions. Try the Search page.`); } catch (e) { setNote('Demo failed: ' + (e instanceof Error ? e.message : String(e))); } finally { setBusy(false); } };
   const doImport = async (files: FileList | null) => { if (!files?.length) return; setBusy(true); try { const r = await importImages([...files].map((f) => ({ name: f.name, blob: f })), { gapMs: 60_000, onProgress: (d, t) => setNote(`Indexing ${d}/${t}…`) }); setNote(`Indexed ${r.stored} image(s)${r.skipped ? `, dropped ${r.skipped} (block-list)` : ''}.`); } catch (e) { setNote('Import failed: ' + (e instanceof Error ? e.message : String(e))); } finally { setBusy(false); } };
   const active = s.phase === 'recording' || s.phase === 'paused';
 
@@ -55,8 +55,6 @@ export function Record() {
   const st = s.stats;
   return (
     <section aria-labelledby="rec-h">
-      <div className="sec"><span className="n">01</span><h2 id="rec-h">Record</h2></div>
-      <p className="lead">Pick a screen or window. Flatpak keeps what changed, blurs what's sensitive, and forgets the rest.</p>
       {s.error && <div className="notice err" role="alert">{s.error}</div>}
       <div className="row" style={{ marginBottom: 16 }}>
         {!active && <button className="btn primary" disabled={s.phase !== 'idle'} onClick={() => void want()}>Start recording</button>}
@@ -88,7 +86,7 @@ export function Record() {
         <div className="stat"><div className="v">{fmtBytes(st.bytes)}</div><div className="k">stored this session</div></div>
         <div className="stat"><div className="v">{st.dropped}</div><div className="k">dropped</div></div>
       </div>
-      <div className="sec"><span className="n">02</span><h2>Latest frames</h2></div>
+      <div className="sec"><h2>Latest frames</h2></div>
       <FrameGrid sessionId={s.session?.id} />
       {consent && <ConsentModal audio={consent === 'audio'} onAccept={() => void (consent === 'audio' ? audioOk() : begin())} onCancel={() => setConsent(null)} />}
     </section>

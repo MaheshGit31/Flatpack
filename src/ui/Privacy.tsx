@@ -29,7 +29,6 @@ export function PrivacyPage() {
   const max = Math.max(1, ...usage.map((u) => u.bytes));
   return (
     <section aria-labelledby="p-h">
-      <div className="sec"><span className="n">01</span><h2 id="p-h">Privacy</h2></div>
       <div className="grid2">
         <div className="card">
           <h3>What happens to a frame</h3>
@@ -50,7 +49,7 @@ export function PrivacyPage() {
                 <div className="stat"><div className="v">{net.afterReady.external}</div><div className="k">to other origins</div></div>
                 <div className="stat"><div className="v">{net.total}</div><div className="k">total this page load</div></div>
               </div>
-              <p className="muted">Models download once from {net.external.length ? [...new Set(net.external.map((e) => e.origin.replace('https://', '')))].join(', ') : 'huggingface.co (not needed yet)'} and are then cached. Every other asset is served from this site.</p>
+              <p className="muted">Models download once from {net.external.length ? [...new Set(net.external.map((e) => e.origin.replace('https://', '')))].join(', ') : 'huggingface.co (not needed yet)'} and are then cached. Every other asset is served from this site. If you add a Gemini key and use Ask AI, those calls to generativelanguage.googleapis.com are counted here too.</p>
               <details><summary>All external requests ({net.external.length})</summary><ul className="netlist mono">{net.external.slice(-40).map((e, i) => <li key={i}>{e.source}: {e.name.slice(0, 90)}</li>)}</ul></details>
               <p className="muted">This panel sees the page and the indexing worker. The automated test checks every thread at the network level.</p>
             </>
@@ -58,7 +57,7 @@ export function PrivacyPage() {
         </div>
       </div>
 
-      <div className="sec"><span className="n">02</span><h2>Controls</h2></div>
+      <div className="sec"><h2>Controls</h2></div>
       <div className="grid2">
         <div className="card">
           <h3>Capture</h3>
@@ -78,7 +77,7 @@ export function PrivacyPage() {
         </div>
       </div>
 
-      <div className="sec"><span className="n">03</span><h2>Your data</h2></div>
+      <div className="sec"><h2>Your data</h2></div>
       <div className="card">
         <div className="row"><b>Auto-delete after</b>
           <select value={s.expiryDays} onChange={(e) => void patch({ expiryDays: Number(e.target.value) })} aria-label="Auto-expiry">

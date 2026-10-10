@@ -41,13 +41,11 @@ export function TimelinePage() {
 
   return (
     <section aria-labelledby="t-h">
-      <div className="sec"><span className="n">01</span><h2 id="t-h">Timeline</h2></div>
-      <p className="lead">Your screen time, split into blocks by time gaps and by how far the screen's CLIP embedding drifts. Each block is labelled with its dominant activity and its most distinctive on-screen words.</p>
       <div className="row filters">
         <label>Split sensitivity <input type="range" min={0.6} max={0.95} step={0.01} value={sim} onChange={(e) => setSim(Number(e.target.value))} /> <span className="mono">{sim.toFixed(2)}</span></label>
         <label>Gap that starts a new block <select value={gapMin} onChange={(e) => setGapMin(Number(e.target.value))}>{[2, 5, 10, 30].map((m) => <option key={m} value={m}>{m} min</option>)}</select></label>
       </div>
-      {!blocks.length && <div className="notice">No frames yet. Record a session or load the demo from the Record tab.</div>}
+      {!blocks.length && <div className="notice">No frames yet. Record a session or load the demo from the Record page.</div>}
       {byDay.map(([day, bs]) => (
         <div key={day}>
           <h3 className="day">{day}</h3>

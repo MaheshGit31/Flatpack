@@ -81,7 +81,6 @@ export function SearchPage() {
   const hitMap = useMemo(() => new Map(hits.map((h) => [h.frameId, h])), [hits]);
   return (
     <section aria-labelledby="s-h">
-      <div className="sec"><span className="n">01</span><h2 id="s-h">Search</h2></div>
       <ModelBar />
       <form className="searchbar" role="search" onSubmit={(e) => { e.preventDefault(); void run(); }}>
         <label className="sr" htmlFor="q">Search what you saw</label>
@@ -98,7 +97,7 @@ export function SearchPage() {
         <label>Activity <select value={act} onChange={(e) => setAct(e.target.value as ActivityLabel | 'any')}><option value="any">Any</option>{ACTIVITY_LABELS.map((a) => <option key={a} value={a}>{a}</option>)}</select></label>
         <label className="chk"><input type="checkbox" checked={speech} onChange={(e) => setSpeech(e.target.checked)} /> Has speech</label>
       </div>
-      {size === 0 && <div className="notice">Nothing indexed yet. Record a session or load the demo from the Record tab.</div>}
+      {size === 0 && <div className="notice">Nothing indexed yet. Record a session or load the demo from the Record page.</div>}
       {err && <div className="notice err" role="alert">{err}</div>}
       {stat && <p className="muted mono" aria-live="polite">{hits.length} result{hits.length === 1 ? '' : 's'} in {stat.ms.toFixed(0)} ms{mode !== 'ocr' ? ` (query embedding ${stat.embedMs.toFixed(0)} ms)` : ''} · searched {size ?? 0} frames on this device</p>}
       <div className="frames results">{hits.map((h, i) => <Card key={h.frameId} hit={h} onOpen={() => setOpen(i)} />)}</div>

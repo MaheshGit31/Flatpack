@@ -7,7 +7,7 @@ const IDS = SCENES.map((s) => s.id);
 
 test.describe('real pipeline over the sample screens', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/#/app/record');
     await page.waitForFunction(() => (window as unknown as { __flatpak?: unknown }).__flatpak);
   });
 
@@ -15,7 +15,7 @@ test.describe('real pipeline over the sample screens', () => {
     const r = await importSamples(page, IDS);
     expect(r.stored).toBe(IDS.length - 1); // the recovery-phrase terminal is dropped by the block-list
     expect(r.skipped).toBe(1);
-    await page.getByRole('navigation').getByRole('button', { name: 'Search' }).click();
+    await page.getByRole('navigation').getByRole('link', { name: 'Search' }).click();
     await page.locator('#q').fill('pricing plans');
     await page.locator('#q').press('Enter');
     await expect(page.locator('.result').first()).toBeVisible({ timeout: 120_000 });
@@ -70,7 +70,7 @@ test.describe('real pipeline over the sample screens', () => {
   test('demo data + benchmark page produce metrics and a JSON export', async ({ page }) => {
     await page.getByRole('button', { name: 'Load demo data' }).click();
     await expect(page.getByText(/Loaded \d+ frames/)).toBeVisible({ timeout: 60_000 });
-    await page.getByRole('button', { name: 'Benchmark' }).click();
+    await page.getByRole('navigation').getByRole('link', { name: 'Benchmark' }).click();
     await page.getByRole('button', { name: 'Run benchmark' }).click();
     await expect(page.getByText(/queries ·/)).toBeVisible({ timeout: 300_000 });
     const rec = await page.evaluate(async () => (window as unknown as { __flatpak: any }).__flatpak.store.getKv('bench-last'));

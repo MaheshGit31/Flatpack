@@ -1,7 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useFrame, useFrameImage } from './hooks';
 import { fmtClock, fmtWhen } from '../util/format';
 import type { OcrWord, SearchHit } from '../types';
+import { analyzeFrame, getCachedAnalysis, getGeminiConfig, type FrameAnalysis } from '../ai/gemini';
+import { href } from './router';
 
 export function Highlights({ words }: { words: OcrWord[] }) {
   return (
@@ -18,6 +20,22 @@ export function Viewer({ ids, index, hits, onIndex, onClose }: { ids: string[]; 
   const { frame, ocr } = useFrame(id);
   const url = useFrameImage(id, 'full');
   const hit = id ? hits?.get(id) : undefined;
+  const [ai, setAi] = useState<FrameAnalysis | null>(null);
+  const [aiErr, setAiErr] = useState<string | null>(null);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiReady, setAiReady] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    setAi(null); setAiErr(null);
+    void getGeminiConfig().then((c) => alive && setAiReady(!!c.key && !!c.consentAt));
+    if (id) void getCachedAnalysis(id).then((a) => alive && setAi(a ?? null));
+    return () => { alive = false; };
+  }, [id]);
+  const analyze = async (force = false) => {
+    if (!id) return;
+    setAiBusy(true); setAiErr(null);
+    try { setAi(await analyzeFrame(id, force)); } catch (e) { setAiErr(e instanceof Error ? e.message : String(e)); } finally { setAiBusy(false); }
+  };
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -44,11 +62,23 @@ export function Viewer({ ids, index, hits, onIndex, onClose }: { ids: string[]; 
         {hit && hit.speech.length > 0 && (
           <div className="card speech">{hit.speech.map((s, i) => <div key={i}><span className="mono muted">{fmtClock(s.startMs)}</span> “{s.text}”</div>)}</div>
         )}
+        {ai && (
+          <div className="gem-box" aria-live="polite">
+            <h4>{ai.title}</h4>
+            <p style={{ margin: 0 }}>{ai.summary}</p>
+            {ai.details.length > 0 && <ul>{ai.details.map((d, i) => <li key={i}>{d}</li>)}</ul>}
+            <p className="muted mono" style={{ margin: '8px 0 0' }}>Gemini ({ai.model}){ai.tags.length ? ' · ' + ai.tags.join(', ') : ''}</p>
+          </div>
+        )}
+        {aiErr && <div className="notice err" role="alert">{aiErr}</div>}
         <details className="ocrtext"><summary>Text found on this screen (redacted)</summary><pre>{ocr?.text || '(none)'}</pre></details>
         <div className="row">
           <button className="btn" disabled={index <= 0} onClick={() => onIndex(index - 1)} aria-label="Previous frame">← Prev</button>
           <button className="btn" disabled={index >= ids.length - 1} onClick={() => onIndex(index + 1)} aria-label="Next frame">Next →</button>
           <span className="muted">Use ← → and Esc</span>
+          {aiReady
+            ? <button className="btn" disabled={aiBusy} onClick={() => void analyze(!!ai)} style={{ marginLeft: 'auto' }}>{aiBusy ? 'Asking Gemini…' : ai ? 'Re-analyze with Gemini' : 'Analyze with Gemini'}</button>
+            : <a className="btn ghost" href={href('ask')} onClick={onClose} style={{ marginLeft: 'auto' }}>Set up Gemini analysis</a>}
         </div>
       </div>
     </div>

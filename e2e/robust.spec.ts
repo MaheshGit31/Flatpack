@@ -9,7 +9,7 @@ const fakeScreen = () => {
 
 test('unsupported browser: clear message, demo still reachable', async ({ page }) => {
   await page.addInitScript(() => { Object.defineProperty(navigator.mediaDevices, 'getDisplayMedia', { value: undefined }); });
-  await page.goto('/');
+  await page.goto('/#/app/record');
   await expect(page.getByRole('alert')).toContainText("can't run Flatpak");
   await expect(page.getByRole('alert')).toContainText('Chrome or Edge');
   await expect(page.getByRole('button', { name: 'Load demo data' })).toBeVisible();
@@ -17,7 +17,7 @@ test('unsupported browser: clear message, demo still reachable', async ({ page }
 
 test('permission denied: nothing recorded, clear error, can retry', async ({ page }) => {
   await page.addInitScript(() => { navigator.mediaDevices.getDisplayMedia = async () => { throw new DOMException('denied', 'NotAllowedError'); }; });
-  await page.goto('/');
+  await page.goto('/#/app/record');
   await page.getByRole('button', { name: 'Start recording' }).click();
   await page.getByRole('button', { name: /I understand/ }).click();
   await expect(page.getByRole('alert')).toContainText('cancelled or denied');
@@ -31,7 +31,7 @@ test('user stops sharing from the browser UI: session closes cleanly', async ({ 
     const orig = navigator.mediaDevices.getDisplayMedia.bind(navigator.mediaDevices);
     navigator.mediaDevices.getDisplayMedia = async (c) => { const s = await orig(c); (window as unknown as { __stream: MediaStream }).__stream = s; return s; };
   });
-  await page.goto('/');
+  await page.goto('/#/app/record');
   await page.getByRole('button', { name: 'Start recording' }).click();
   await page.getByRole('button', { name: /I understand/ }).click();
   await expect(page.locator('.rec-pill')).toContainText('REC');
@@ -44,7 +44,7 @@ test('user stops sharing from the browser UI: session closes cleanly', async ({ 
 
 test('index worker crash: capture keeps going, worker is restarted, indexing resumes', async ({ page }) => {
   await page.addInitScript(fakeScreen);
-  await page.goto('/');
+  await page.goto('/#/app/record');
   await page.getByRole('button', { name: 'Start recording' }).click();
   await page.getByRole('button', { name: /I understand/ }).click();
   await page.waitForFunction(() => document.querySelectorAll('.frame').length >= 2, null, { timeout: 180_000 });
@@ -58,7 +58,7 @@ test('index worker crash: capture keeps going, worker is restarted, indexing res
 
 test('reload mid-recording: data survives and the dangling session is closed', async ({ page }) => {
   await page.addInitScript(fakeScreen);
-  await page.goto('/');
+  await page.goto('/#/app/record');
   await page.getByRole('button', { name: 'Start recording' }).click();
   await page.getByRole('button', { name: /I understand/ }).click();
   await page.waitForFunction(() => document.querySelectorAll('.frame').length >= 2, null, { timeout: 180_000 });
@@ -68,6 +68,6 @@ test('reload mid-recording: data survives and the dangling session is closed', a
   const r = await page.evaluate(async () => { const s = (window as unknown as { __flatpak: any }).__flatpak.store; return { n: await s.frameCount(), sessions: await s.listSessions() }; });
   expect(r.n).toBeGreaterThanOrEqual(2);
   expect(r.sessions[0].endedAt).not.toBeNull();
-  await page.getByRole('navigation').getByRole('button', { name: 'Timeline' }).click();
+  await page.getByRole('navigation').getByRole('link', { name: 'Timeline' }).click();
   await expect(page.locator('.block').first()).toBeVisible();
 });

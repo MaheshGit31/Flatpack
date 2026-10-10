@@ -31,7 +31,7 @@ export function BenchmarkPage() {
     setErr(null); setRun({ done: 0, total: 1 });
     try {
       const res = await runBenchmark(undefined, (done, total) => setRun({ done, total }));
-      if (!res.frames) throw new Error('No labelled frames found. Load the demo data from the Record tab first.');
+      if (!res.frames) throw new Error('No labelled frames found. Load the demo data from the Record page first.');
       await saveBenchmark(res); setR(res);
     } catch (e) { setErr(e instanceof Error ? e.message : String(e)); } finally { setRun(null); }
   };
@@ -45,8 +45,6 @@ export function BenchmarkPage() {
   };
   return (
     <section aria-labelledby="b-h">
-      <div className="sec"><span className="n">01</span><h2 id="b-h">Benchmark</h2></div>
-      <p className="lead">Labelled queries over the demo screens. It runs on this device with the real models, so the numbers are yours.</p>
       <ModelBar />
       <div className="row"><button className="btn primary" onClick={() => void go()} disabled={!!run}>{run ? `Running ${run.done}/${run.total}…` : 'Run benchmark'}</button>{r && <button className="btn" onClick={download}>Export JSON</button>}</div>
       {err && <div className="notice err" role="alert">{err}</div>}

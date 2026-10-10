@@ -200,3 +200,5 @@ dialog .fine{margin:0 0 14px}
 }
 @media(max-width:420px){.wrap{padding:0 16px}.nav-in{padding:0 16px}.logo-box{font-size:16px;padding:7px 9px}.mark{width:42px;height:42px;font-size:20px}.wrap>h2{gap:12px}.btn.big{width:100%}}
 @media(min-width:960px){.hero-guy{width:96px}.loop{gap:16px}}
+.failed .why{margin:0;padding:0 14px;text-align:center;font-size:12px;color:var(--mute);max-width:100%}
+.failed .q{font-size:56px}

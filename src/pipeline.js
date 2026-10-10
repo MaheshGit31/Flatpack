@@ -35,6 +35,7 @@ async function produceStep(guide, step, emit, { photo, fixPhoto, replaced = fals
     emit('critic', { n, passed, retried });
   } catch (e) {
     const error = safeErr(e);
+    console.error(`[panel ${n}] failed: ${String(e?.message || e).slice(0, 500)}`.replace(process.env.GEMINI_API_KEY || '\u0000', '[redacted]'));
     setPanel(guide, n, { status: 'failed', error });
     emit('panel_error', { n, message: error });
   }

@@ -91,14 +91,15 @@
     b.className = 'badge ' + (kind === 'ok' ? 'ok' : kind === 'warn' ? 'warn' : '');
     b.textContent = text || '';
   }
-  function showFailed(n) {
+  function showFailed(n, why) {
     var li = slot(n); if (!li) return;
     var frame = li.querySelector('.frame');
     var sk = frame.querySelector('.skel'); if (sk) sk.remove();
     var im = frame.querySelector('img'); if (im) im.remove();
     li.classList.remove('has-img', 'redraw');
     if (!frame.querySelector('.failed')) {
-      var d = el('div', 'failed', '<span class="q" aria-hidden="true">?</span><button class="btn" type="button">Retry this step</button>');
+      var d = el('div', 'failed', '<span class="q" aria-hidden="true">?</span><p class="why"></p><button class="btn" type="button">Retry this step</button>');
+      d.querySelector('.why').textContent = why ? String(why).slice(0, 110) : '';
       d.querySelector('button').addEventListener('click', function () { retryStep(n); });
       frame.appendChild(d);
     }
@@ -121,7 +122,7 @@
         break;
       case 'panel': showPanel(d.n, 'data:' + d.mime + ';base64,' + d.imageBase64); break;
       case 'critic': setCritic(d); break;
-      case 'panel_error': showFailed(d.n); break;
+      case 'panel_error': showFailed(d.n, d.message); break;
       case 'fix':
         d.regenerate.forEach(function (n) { var s = slot(n); if (s) s.classList.add('redraw'); setBadge(n, '', 'redrawing...'); });
         setStatus('redrawing step' + (d.regenerate.length > 1 ? 's ' : ' ') + d.regenerate.join(', '));

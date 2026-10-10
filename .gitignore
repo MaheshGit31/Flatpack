@@ -1,7 +1,8 @@
-.env
-/data/guides
 node_modules
+dist
+public/ort
+public/tesseract/*.js
+test-results
+playwright-report
+.vite
 *.log
-.DS_Store
-.env 
-secret_file_name.txt 

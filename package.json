@@ -1,27 +1,36 @@
 {
-  "name": "flatpack",
-  "version": "1.0.0",
-  "description": "FLATPACK - instructions shouldn't need a language.",
-  "type": "module",
+  "name": "flatpak",
+  "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": ">=20"
-  },
+  "type": "module",
+  "description": "Flatpak: screen memory. Stays on your device.",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
-    "make-character": "node scripts/make-character.js",
-    "make-demos": "node scripts/make-demos.js",
-    "test": "node scripts/e2e.js"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 4173",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "predev": "node scripts/copy-assets.mjs",
+    "prebuild": "node scripts/copy-assets.mjs",
+    "pretest:e2e": "node scripts/copy-assets.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "fake-indexeddb": "^6.2.5",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.3"
   },
   "dependencies": {
-    "@google/genai": "^1.0.0",
-    "compression": "^1.8.2",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "express-rate-limit": "^7.4.0",
-    "multer": "^1.4.5-lts.1",
-    "pdf-lib": "^1.17.1",
-    "sharp": "^0.33.5"
+    "@huggingface/transformers": "^4.3.1",
+    "idb": "^8.0.4",
+    "onnxruntime-web": "^1.31.0-dev.20260914-8d85527a0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "tesseract.js": "^7.0.0"
   }
 }

@@ -19,8 +19,8 @@ Node 20+. No build step.
 | var | default | notes |
 |---|---|---|
 | `GEMINI_API_KEY` | none | required for real output. **Without it the app runs in MOCK MODE** (placeholder panels) so you can test the plumbing |
-| `IMAGE_MODEL` | `gemini-2.5-flash-image` | Nano Banana. swap models here only |
-| `VISION_MODEL` | `gemini-2.5-flash` | read / plan / critic |
+| `IMAGE_MODEL` | `gemini-3.1-flash-image` | Nano Banana 2. swap models here only (older ones like `gemini-2.5-flash-image` are legacy and 404 for new keys) |
+| `VISION_MODEL` | `gemini-3.8-flash` | read / plan / critic |
 | `PORT` | `3000` | Railway sets this |
 | `IMAGE_ASPECT` | `1:1` | set to empty if your image model rejects `imageConfig` |
 | `CALL_TIMEOUT_MS` | `60000` | per model call; one retry on 429/5xx with backoff |

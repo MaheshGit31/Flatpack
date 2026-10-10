@@ -44,6 +44,7 @@ export function safeErr(e) {
   // never leak the API key into logs/messages
   const key = process.env.GEMINI_API_KEY;
   let m = String(e?.message || e || 'unknown error');
+  if (m.trim().startsWith('{')) { try { const j = JSON.parse(m); m = j?.error?.message || m; } catch { /* keep raw */ } }
   if (key) m = m.split(key).join('[redacted]');
   return m.slice(0, 300);
 }

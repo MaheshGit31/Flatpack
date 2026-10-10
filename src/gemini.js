@@ -23,7 +23,6 @@ export async function generateJson({ system, parts, schema, mockKey, mockArgs })
           systemInstruction: system,
           responseMimeType: 'application/json',
           responseSchema: schema,
-          temperature: 0.4,
         },
       }),
       config.timeoutMs,

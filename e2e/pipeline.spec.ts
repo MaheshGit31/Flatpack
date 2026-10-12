@@ -70,7 +70,7 @@ test.describe('real pipeline over the sample screens', () => {
   test('demo data + benchmark page produce metrics and a JSON export', async ({ page }) => {
     await page.getByRole('button', { name: 'Load demo data' }).click();
     await expect(page.getByText(/Loaded \d+ frames/)).toBeVisible({ timeout: 60_000 });
-    await page.getByRole('navigation').getByRole('link', { name: 'Benchmark' }).click();
+    await page.goto('/#/app/benchmark');
     await page.getByRole('button', { name: 'Run benchmark' }).click();
     await expect(page.getByText(/queries ·/)).toBeVisible({ timeout: 300_000 });
     const rec = await page.evaluate(async () => (window as unknown as { __flatpak: any }).__flatpak.store.getKv('bench-last'));

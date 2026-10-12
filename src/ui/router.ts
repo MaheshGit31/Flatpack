@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
-export type AppPage = 'overview' | 'record' | 'search' | 'timeline' | 'ask' | 'privacy' | 'benchmark';
+export type AppPage = 'overview' | 'record' | 'search' | 'timeline' | 'ask' | 'privacy' | 'benchmark' | 'offline';
 export type Route = { kind: 'landing' } | { kind: 'app'; page: AppPage };
 
-export const APP_PAGES: AppPage[] = ['overview', 'record', 'search', 'timeline', 'ask', 'privacy', 'benchmark'];
+export const APP_PAGES: AppPage[] = ['overview', 'record', 'search', 'timeline', 'ask', 'privacy', 'benchmark', 'offline'];
 
 export function parseHash(hash: string): Route {
   const h = hash.replace(/^#\/?/, '');

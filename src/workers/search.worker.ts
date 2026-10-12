@@ -46,7 +46,7 @@ if (ch) {
       const [f, o] = await Promise.all([getFrame(m.frameId), getOcr(m.frameId)]);
       const v = await (await db()).get('vectors', m.frameId);
       if (f && v) { engine.add(f, v.vec, o); emit('size', engine.size); }
-    } else if (m.type === 'frames-deleted' || m.type === 'transcript-added') {
+    } else if (m.type === 'frames-deleted' || m.type === 'transcript-added' || m.type === 'labels-changed') {
       loaded = loadAll();
     }
   };

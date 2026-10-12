@@ -22,3 +22,34 @@ test('after the models are cached, indexing and searching make zero external req
   expect(external, `unexpected external requests:\n${external.join('\n')}`).toEqual([]);
   await ctx.close();
 });
+
+// The real thing: warm everything, cut the network at the browser level, cold-reload, and keep working.
+test('airplane mode: after prepare, a cold reload and a search work with the network off', async ({ browser }) => {
+  test.setTimeout(240_000);
+  const ctx = await browser.newContext({ ignoreHTTPSErrors: true });
+  const page = await ctx.newPage();
+  await page.goto('/#/app/offline');
+  await page.getByRole('button', { name: 'Load demo screens' }).click();
+  await page.getByRole('button', { name: 'Prepare for offline' }).click();
+  await expect(page.getByText('Ready: this app will open')).toBeVisible({ timeout: 200_000 }).catch(async () => { await page.reload(); await expect(page.getByText('Ready: this app will open')).toBeVisible({ timeout: 30_000 }); });
+
+  await ctx.setOffline(true);
+  await page.reload();
+  await expect(page.getByText(/Network: offline, still working/).first()).toBeVisible();
+  await page.getByRole('button', { name: 'Search offline' }).click();
+  await expect(page.getByText(/network was off/)).toBeVisible({ timeout: 60_000 });
+  await ctx.close();
+});
+
+test('simulated airplane mode refuses outside requests and flips the status chip', async ({ browser }) => {
+  const ctx = await browser.newContext({ ignoreHTTPSErrors: true });
+  const page = await ctx.newPage();
+  await page.goto('/#/app/offline');
+  await page.waitForFunction(() => !!navigator.serviceWorker.controller || navigator.serviceWorker.getRegistration().then((r) => !!r?.active), null, { timeout: 20_000 }).catch(() => undefined);
+  await page.reload();
+  await page.getByRole('button', { name: 'Airplane mode (simulate)' }).click();
+  await expect(page.getByText('Network: offline, still working').first()).toBeVisible();
+  const blocked = await page.evaluate(() => fetch('https://example.com/').then(() => false, () => true));
+  expect(blocked).toBe(true);
+  await ctx.close();
+});

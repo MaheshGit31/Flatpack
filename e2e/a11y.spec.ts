@@ -11,8 +11,10 @@ for (const scheme of ['light', 'dark'] as const) {
     await page.goto('/#/app/record');
     await page.getByRole('button', { name: 'Load demo data' }).click();
     await expect(page.getByText(/Loaded \d+ frames/)).toBeVisible({ timeout: 60_000 });
-    for (const tab of ['Overview', 'Record', 'Search', 'Timeline', 'Ask AI', 'Privacy', 'Benchmark']) {
-      await page.getByRole('navigation').getByRole('link', { name: tab }).click();
+    for (const tab of ['Home', 'Recording', 'Search', 'Your day', 'Ask AI', 'Airplane mode', 'Privacy', 'Accuracy test']) {
+      const link = page.getByRole('navigation').getByRole('link', { name: tab });
+      if (!(await link.isVisible())) await page.getByRole('navigation').getByText('Advanced').click();
+      await link.click();
       await page.waitForTimeout(400);
       const res = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
       const bad = res.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');

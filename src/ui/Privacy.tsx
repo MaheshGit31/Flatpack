@@ -3,6 +3,7 @@ import { deleteEverything, deleteSession, expireOld, getKv, getSettings, listSes
 import { collectNet, summarize, type NetSummary } from '../privacy/netaudit';
 import { recorder } from '../capture/recorder';
 import type { SessionRec, Settings } from '../types';
+import { experimentalAudio } from '../util/flags';
 import { fmtBytes } from '../util/format';
 
 export function PrivacyPage() {
@@ -65,7 +66,7 @@ export function PrivacyPage() {
           <label className="fld">Duplicate threshold <input type="range" min={0} max={20} value={s.dedupeThreshold} onChange={(e) => void patch({ dedupeThreshold: Number(e.target.value) })} /> <span className="mono">{s.dedupeThreshold} bits</span></label>
           <p className="muted">Frames within this many differing bits (of 64) of the last kept frame, with a quiet change grid, are treated as unchanged. Applies to the next recording.</p>
           <label className="chk"><input type="checkbox" checked={s.ocrEnabled} onChange={(e) => void patch({ ocrEnabled: e.target.checked })} /> Read text on screen (OCR, needed for redaction and text search)</label>
-          <label className="chk"><input type="checkbox" checked={s.audioFeature} onChange={(e) => void patch({ audioFeature: e.target.checked })} /> Enable voice memory (experimental, off by default)</label>
+          {experimentalAudio() && <label className="chk"><input type="checkbox" checked={s.audioFeature} onChange={(e) => void patch({ audioFeature: e.target.checked })} /> Enable voice memory (experimental, off by default)</label>}
         </div>
         <div className="card">
           <h3>Never store a screen that shows…</h3>

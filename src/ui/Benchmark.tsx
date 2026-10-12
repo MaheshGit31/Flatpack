@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { runBenchmark, saveBenchmark, type BenchResult } from '../eval/bench';
 import { getKv } from '../store/db';
 import { ModelBar } from './ModelBar';
+import { HeadBench } from './HeadBench';
 
 const pct = (x: number) => `${(x * 100).toFixed(0)}%`;
 
@@ -71,6 +72,7 @@ export function BenchmarkPage() {
           </details>
         </>
       )}
+      <HeadBench />
     </section>
   );
 }

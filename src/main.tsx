@@ -7,6 +7,9 @@ import '@fontsource/instrument-serif/latin-400-italic.css';
 import { App } from './ui/App';
 import './ui/styles.css';
 import './testhook';
+import { registerSW } from './offline/sw';
+
+registerSW();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

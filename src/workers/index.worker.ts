@@ -1,6 +1,7 @@
 /// Index worker. Per kept frame: OCR → redact (blur stored pixels) → CLIP on the REDACTED pixels → label → WebP → IndexedDB.
 /// The un-redacted bitmap lives only in this function's scope and is never persisted.
-import { getSettings, putFrameBundle } from '../store/db';
+import { getHead, getSettings, putFrameBundle, setKv } from '../store/db';
+import { predict } from '../model/head';
 import { serve } from '../util/rpc';
 import { loadClip, type ClipHandle } from '../models/clip';
 import { loadOcr, type OcrHandle } from '../models/ocr';
@@ -48,6 +49,7 @@ const emit = serve(self as unknown as WorkerScope, {
         ]);
         clip = c;
         ocr = o;
+        void setKv('zs-labels', c.labelVecs).catch(() => undefined); // initial weights of the trainable head
         emit('models', { state: 'ready', loadMs: c.loadMs, backend: c.backend });
       } catch (e) {
         initP = null;
@@ -56,6 +58,11 @@ const emit = serve(self as unknown as WorkerScope, {
       }
     })();
     return initP.then(() => ({ ok: true, backend: clip?.backend, loadMs: clip?.loadMs, ocr: !!ocr }));
+  },
+
+  async zsLabels() {
+    await initP;
+    return clip!.labelVecs;
   },
 
   async embedText(a: { q: string }) {
@@ -113,7 +120,9 @@ const emit = serve(self as unknown as WorkerScope, {
     const sq = new OffscreenCanvas(CLIP_SIZE, CLIP_SIZE).getContext('2d', { willReadFrequently: true })!;
     sq.drawImage(canvas, 0, 0, CLIP_SIZE, CLIP_SIZE);
     const vec = await clip!.embedImage(sq.getImageData(0, 0, CLIP_SIZE, CLIP_SIZE).data, CLIP_SIZE, CLIP_SIZE);
-    const { label, conf } = clip!.classify(vec);
+    const zs = clip!.classify(vec);
+    const head = await getHead().catch(() => undefined); // trained head if the user has corrected labels, else the zero-shot classifier
+    const { label, conf } = head ? predict(head, vec) : zs;
 
     // 5. encode + store
     const full = await canvas.convertToBlob({ type: 'image/webp', quality: 0.7 });
@@ -126,7 +135,7 @@ const emit = serve(self as unknown as WorkerScope, {
     const indexMs = performance.now() - t0;
     const keepWords = words.map((x, i) => (red.hit.has(i) ? { ...x, t: '█' } : x));
     await putFrameBundle({
-      frame: { id: frameId, sessionId: a.sessionId, seq: a.seq, tMs: a.tMs, wall: a.wall, w, h, activity: label, activityConf: conf, hasText: storedText.trim().length > 0, redactions: red.count, fullBytes: full.size, thumbBytes: thumb.size, indexMs, hash: a.hash },
+      frame: { id: frameId, sessionId: a.sessionId, seq: a.seq, tMs: a.tMs, wall: a.wall, w, h, activity: label, activityConf: conf, zsActivity: zs.label, hasText: storedText.trim().length > 0, redactions: red.count, fullBytes: full.size, thumbBytes: thumb.size, indexMs, hash: a.hash },
       blobs: { frameId, full, thumb },
       vec: { frameId, vec },
       ocr: { frameId, text: storedText, words: keepWords },

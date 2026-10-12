@@ -8,14 +8,16 @@ import { fmtBytes, fmtClock } from '../util/format';
 import { loadDemo } from '../store/demo';
 import { importImages } from '../capture/importer';
 import { ModelBar } from './ModelBar';
+import { experimentalAudio } from '../util/flags';
 
 export function Record() {
   const s = useRecorder();
   const [consent, setConsent] = useState<null | 'screen' | 'audio'>(null);
+  const exp = experimentalAudio();
   const [voice, setVoice] = useState(false);
   const [sys, setSys] = useState(false);
   const [mic, setMic] = useState(false);
-  useEffect(() => { void getSettings().then((x) => setVoice(x.audioFeature)); }, []);
+  useEffect(() => { void getSettings().then((x) => setVoice(exp && x.audioFeature)); }, []);
   const support = browserSupport();
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -28,11 +30,11 @@ export function Record() {
     const st = await getSettings();
     if (!st.consentAcceptedAt) await saveSettings({ consentAcceptedAt: Date.now() });
     setConsent(null);
-    await recorder().start({ systemAudio: voice && sys, mic: voice && mic });
+    await recorder().start({ systemAudio: exp && voice && sys, mic: exp && voice && mic });
   };
   const want = async () => {
     const st = await getSettings();
-    if (voice && (sys || mic) && !st.audioConsentAcceptedAt) return setConsent('audio');
+    if (exp && voice && (sys || mic) && !st.audioConsentAcceptedAt) return setConsent('audio');
     return st.consentAcceptedAt ? void begin() : setConsent('screen');
   };
   const audioOk = async () => {
@@ -62,9 +64,9 @@ export function Record() {
         {active && <button className="btn danger" onClick={() => void recorder().stop()}>Stop</button>}
         {active && <span className="mono">{fmtClock(s.elapsedMs)}</span>}
         {st.captureOnly && active && <span className="badge">capture-only: indexer behind</span>}
-        {s.audioTracks > 0 && <span className="badge">listening · {st.transcribed} line{st.transcribed === 1 ? '' : 's'}{st.audioPending ? ` · ${st.audioPending} queued` : ''}</span>}
+        {exp && s.audioTracks > 0 && <span className="badge">listening · {st.transcribed} line{st.transcribed === 1 ? '' : 's'}{st.audioPending ? ` · ${st.audioPending} queued` : ''}</span>}
       </div>
-      {!active && (
+      {exp && !active && (
         <fieldset className="voice">
           <legend>Voice memory <span className="badge">experimental</span></legend>
           <label className="chk"><input type="checkbox" checked={voice} onChange={(e) => { setVoice(e.target.checked); void saveSettings({ audioFeature: e.target.checked }); }} /> Transcribe speech locally (adds a ~44 MB speech model)</label>

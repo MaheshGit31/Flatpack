@@ -1,6 +1,7 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import {
   DEFAULT_SETTINGS,
+  type ActivityLabel,
   type BlobRec,
   type FrameRec,
   type OcrRec,
@@ -11,6 +12,7 @@ import {
   type VecRec,
 } from '../types';
 import { dayKey } from '../util/format';
+import { predict, type Head } from '../model/head';
 
 interface FlatpakDB extends DBSchema {
   sessions: { key: string; value: SessionRec; indexes: { byStart: number } };
@@ -51,7 +53,8 @@ export function db(): Promise<IDBPDatabase<FlatpakDB>> {
 export type DbEvent =
   | { type: 'frame-added'; frameId: string }
   | { type: 'frames-deleted'; sessionId?: string; all?: boolean }
-  | { type: 'transcript-added'; sessionId: string };
+  | { type: 'transcript-added'; sessionId: string }
+  | { type: 'labels-changed' };
 
 export function dbChannel(): BroadcastChannel | null {
   return typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel(CHANNEL);
@@ -205,6 +208,44 @@ export async function listTranscript(sessionId?: string): Promise<TranscriptRec[
   const d = await db();
   const rows = sessionId ? await d.getAllFromIndex('transcript', 'bySession', sessionId) : await d.getAll('transcript');
   return rows.sort((a, b) => a.startMs - b.startMs);
+}
+
+// ---------- activity labels + trainable head ----------
+export async function setUserLabels(ids: string[], label: ActivityLabel | null): Promise<void> {
+  const d = await db();
+  const tx = d.transaction('frames', 'readwrite');
+  for (const id of ids) {
+    const f = await tx.store.get(id);
+    if (!f) continue;
+    const next = { ...f };
+    if (label) { next.userActivity = label; next.activity = label; next.activityConf = 1; }
+    else delete next.userActivity;
+    await tx.store.put(next);
+  }
+  await tx.done;
+  notify({ type: 'labels-changed' });
+}
+export const getZeroLabels = (): Promise<Float32Array | undefined> => getKv<Float32Array>('zs-labels');
+export const getHead = (): Promise<Head | undefined> => getKv<Head>('head');
+export async function saveHead(h: Head | null): Promise<void> {
+  await (await db()).put('settings', { key: 'kv:head', value: h });
+}
+/** Re-label every frame from its stored embedding (no images needed). User-corrected frames keep their user label. */
+export async function relabelAll(head: Head): Promise<number> {
+  const d = await db();
+  const frames = await d.getAll('frames');
+  let n = 0;
+  for (const f of frames) {
+    const v = await d.get('vectors', f.id);
+    if (!v) continue;
+    const next = { ...f };
+    if (f.userActivity) { next.activity = f.userActivity; next.activityConf = 1; }
+    else { const p = predict(head, v.vec); next.activity = p.label; next.activityConf = p.conf; }
+    if (next.activity !== f.activity) n++;
+    await d.put('frames', next);
+  }
+  notify({ type: 'labels-changed' });
+  return n;
 }
 
 // ---------- housekeeping ----------

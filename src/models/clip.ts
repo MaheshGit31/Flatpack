@@ -30,6 +30,8 @@ export interface ClipHandle {
   embedImage(rgba: Uint8ClampedArray, w: number, h: number): Promise<Float32Array>;
   embedText(q: string): Promise<Float32Array>;
   classify(vec: Float32Array): { label: ActivityLabel; conf: number };
+  /** zero-shot label embeddings, flat K*512 in ACTIVITY_LABELS order: the initial weights of the trainable head */
+  labelVecs: Float32Array;
 }
 
 export function l2(v: Float32Array): Float32Array {
@@ -124,5 +126,7 @@ export async function loadClip(onProgress: (p: ModelProgress) => void, wasmBase:
     return { label: ACTIVITY_LABELS[bi]!, conf: exps[bi]! / z };
   };
 
-  return { backend, loadMs: performance.now() - t0, embedImage, embedText, classify };
+  const flat = new Float32Array(ACTIVITY_LABELS.length * 512);
+  ACTIVITY_LABELS.forEach((l, i) => flat.set(labelVecs.get(l)!, i * 512));
+  return { backend, loadMs: performance.now() - t0, embedImage, embedText, classify, labelVecs: flat };
 }

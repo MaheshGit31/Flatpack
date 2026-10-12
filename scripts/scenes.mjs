@@ -49,3 +49,13 @@ export const SCENES = [
     html: page(`body{background:#fff;font-size:21px}.t{background:#107c41;color:#fff;padding:12px 20px;font-size:24px}table{border-collapse:collapse;margin:10px}td,th{border:1px solid #bbb;padding:10px 26px}th{background:#e8f5e9}tr:last-child td{font-weight:700;background:#fffbe6}`,
       `<div class=t>Q3 budget.xlsx</div><table><tr><th>Category</th><th>Planned</th><th>Actual</th></tr><tr><td>Marketing</td><td>12,000</td><td>13,450</td></tr><tr><td>Engineering</td><td>48,000</td><td>46,210</td></tr><tr><td>Travel</td><td>6,500</td><td>8,120</td></tr><tr><td>Total</td><td>66,500</td><td>67,780</td></tr></table>`) },
 ];
+
+// Appearance variants of the same synthetic apps (dark mode, zoomed layout, tinted, dim). Used ONLY to build the labelled pack for the
+// classifier-head benchmark: they model "the same apps coming back at another time in another look", not brand-new apps.
+export const VARIANTS = [
+  { id: 'orig', css: '' },
+  { id: 'dark', css: 'html{filter:invert(1) hue-rotate(180deg)}' },
+  { id: 'zoom', css: 'html{zoom:1.18}' },
+  { id: 'tint', css: 'html{filter:hue-rotate(40deg) saturate(1.35)}' },
+  { id: 'dim', css: 'html{filter:brightness(.72) contrast(1.1)}' },
+];

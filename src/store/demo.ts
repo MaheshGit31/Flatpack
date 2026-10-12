@@ -1,4 +1,4 @@
-import { db, setKv, dbChannel } from './db';
+import { db, setKv, dbChannel, getZeroLabels } from './db';
 import { ACT_KEY, LABEL_KEY } from '../eval/bench';
 import type { ActivityLabel, OcrWord, SessionRec } from '../types';
 
@@ -24,7 +24,7 @@ export async function loadDemo(base = new URL('./', document.baseURI).href): Pro
       const [full, thumb] = await Promise.all([fetch(new URL('demo/' + f.full, base)).then((r) => r.blob()), fetch(new URL('demo/' + f.thumb, base)).then((r) => r.blob())]);
       const frameId = `${id}:${f.seq}`;
       const tx = d.transaction(['frames', 'blobs', 'vectors', 'ocr'], 'readwrite');
-      tx.objectStore('frames').put({ id: frameId, sessionId: id, seq: f.seq, tMs: f.tMs, wall: startedAt + f.tMs, w: f.w, h: f.h, activity: f.activity, activityConf: f.activityConf, hasText: f.hasText, redactions: f.redactions, fullBytes: full.size, thumbBytes: thumb.size, indexMs: f.indexMs, hash: f.hash });
+      tx.objectStore('frames').put({ id: frameId, sessionId: id, seq: f.seq, tMs: f.tMs, wall: startedAt + f.tMs, w: f.w, h: f.h, activity: f.activity, activityConf: f.activityConf, zsActivity: f.activity, hasText: f.hasText, redactions: f.redactions, fullBytes: full.size, thumbBytes: thumb.size, indexMs: f.indexMs, hash: f.hash });
       tx.objectStore('blobs').put({ frameId, full, thumb });
       tx.objectStore('vectors').put({ frameId, vec: new Float32Array(vecBuf.slice(f.vecRow * manifest.dim * 4, (f.vecRow + 1) * manifest.dim * 4)) });
       tx.objectStore('ocr').put({ frameId, text: f.text, words: f.words });
@@ -32,6 +32,10 @@ export async function loadDemo(base = new URL('./', document.baseURI).href): Pro
       labels[frameId] = f.scene;
       nFrames++;
     }
+  }
+  // zero-shot label embeddings (same CLIP text encoder) so the trainable head works without loading the models
+  if (!(await getZeroLabels())) {
+    try { const r = await fetch(new URL('demo/labels.bin', base)); if (r.ok) await setKv('zs-labels', new Float32Array(await r.arrayBuffer())); } catch { /* optional */ }
   }
   await setKv(LABEL_KEY, labels);
   await setKv(ACT_KEY, manifest.expected);

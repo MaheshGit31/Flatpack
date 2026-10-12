@@ -21,15 +21,15 @@ export function Landing() {
 
         <main>
           <section className="lp-hero" aria-labelledby="h1">
-            <span className="eyebrow">screen memory · stays on your device</span>
+            <span className="eyebrow">private screen memory · works offline</span>
             <h1 id="h1">Ctrl+F for everything you’ve <em>looked at.</em></h1>
-            <p className="sub">Flatpak remembers your screen so you can search it later by describing it or quoting it. It runs entirely in your browser: no account, no upload, no server.</p>
+            <p className="sub">Flatpak remembers your screen so you can search it later by describing it or quoting it. It runs entirely in your browser, and keeps working with the network off: no account, no upload, no server.</p>
             <div className="lp-cta">
               <a className="btn primary lg" href="#/app/record">Start recording</a>
               <button className="btn lg" onClick={() => void tryDemo()} disabled={busy}>{busy ? 'Loading demo…' : 'Try it with demo data'}</button>
             </div>
             {err && <div className="notice err" role="alert">{err}</div>}
-            <p className="lp-fine">Desktop Chrome or Edge. The first run downloads about 155 MB of models once, then works offline.</p>
+            <p className="lp-fine">Desktop Chrome or Edge. The first run downloads about 155 MB of models once, then works offline. <a href="#/app/offline">Try airplane mode</a>.</p>
             <figure className="lp-shot" style={{ width: '100%' }} aria-label="Example search">
               <div className="bar-top"><i /><i /><i /><span>flatpak · search</span></div>
               <div className="demo-q" aria-hidden><span className="muted">⌕</span><b>that red line chart from yesterday</b><span className="caret" /></div>

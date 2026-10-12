@@ -1,17 +1,18 @@
 # Flatpak
 
-**Screen memory. Stays on your device.**
-Ctrl+F for everything you've looked at. Search what you saw and heard, 100% in your browser: no account, no upload, no server.
+**Private screen memory that works offline in your browser.**
+Ctrl+F for everything you've looked at. Cache it once, turn the network off, and it keeps working: no account, no upload, no server.
 
 Built for Banana Hacks 2026. It is a static site: the app, the OCR engine, the ONNX runtime and your data all live in the browser. After the AI models are downloaded once, it makes no network requests at all.
 
 ## What it does
 
-1. **Record** a screen, window or tab (and optionally your microphone or tab audio). Frames are sampled about every 3 seconds, near-duplicates are dropped, and each kept frame goes through OCR, redaction, a CLIP embedding and a zero-shot activity label, then into IndexedDB.
-2. **Search** with plain words. Results fuse a visual signal (CLIP image-text similarity) with a text signal (BM25 over OCR, with prefix and typo tolerance) and, if you used voice, a speech signal, using Reciprocal Rank Fusion (k = 60). Every result shows which signal found it and where the matching words sit on the screenshot.
-3. **Timeline** groups your day into labelled blocks (time gaps plus CLIP embedding drift).
-4. **Privacy** shows what happens to a frame, lets you tune capture, edit the block-list, expire or delete data, and audit network requests.
-5. **Benchmark** runs ~48 labelled queries on this device and reports recall@1, recall@5 and MRR for CLIP-only, OCR-only and fused search.
+1. **Record** a screen, window or tab . Frames are sampled about every 3 seconds, near-duplicates are dropped, and each kept frame goes through OCR, redaction, a CLIP embedding and an activity label from a trainable head, then into IndexedDB.
+2. **Search** with plain words. Results fuse a visual signal (CLIP image-text similarity) with a text signal (BM25 over OCR, with prefix and typo tolerance) using Reciprocal Rank Fusion (k = 60). Every result shows which signal found it and where the matching words sit on the screenshot.
+3. **Timeline** groups your day into labelled blocks (time gaps plus CLIP embedding drift). Change a block's activity and a classifier head (logistic regression on CLIP image embeddings, initialised from zero-shot) retrains on-device; weights persist in IndexedDB.
+4. **Airplane mode** caches the app and models, shows a live network status, and runs search offline. See `e2e/offline.spec.ts`.
+5. **Privacy** shows what happens to a frame, lets you tune capture, edit the block-list, expire or delete data, and audit network requests.
+6. **Benchmark** runs ~48 labelled queries (recall@1, recall@5, MRR for CLIP, OCR, fused) and a holdout evaluation of zero-shot vs trained head.
 
 Click **Load demo data** on the Record tab to try everything without recording (3 pre-indexed sessions of synthetic, public-safe screens).
 
@@ -21,8 +22,7 @@ Click **Load demo data** on the Record tab to try everything without recording (
 - Pipeline order is **dedupe → OCR → redact → CLIP → store**. The original pixels are overwritten in memory before CLIP sees them and before anything is written. Originals are never persisted.
 - Redaction covers Luhn-valid card numbers, emails (including ones OCR splits around the @), phone numbers, US SSNs, common API-key/token shapes, and the value next to labels such as password / token / secret / API key / CVC / PIN. Hits are pixelated in the stored image and replaced in the stored OCR text.
 - A user-editable block-list drops the **entire frame** when a phrase is on screen (defaults: private key, seed phrase, recovery phrase, one-time password, otp code).
-- A recording indicator is always visible (page badge, tab title and favicon, optional Picture-in-Picture mini recorder). Pause/resume with Alt+Shift+P. Consent modals appear before screen and before voice recording.
-- Voice: audio is processed in memory and **never stored**; only scrubbed transcript text is kept.
+- A recording indicator is always visible (page badge, tab title and favicon, optional Picture-in-Picture mini recorder). Pause/resume with Alt+Shift+P. A consent modal appears before screen recording.
 - Auto-expiry (default 7 days), per-session delete, delete-everything, and delete-everything-plus-cached-models.
 - The Privacy tab has a network audit. It sees the page and the indexing worker; the Playwright test (`e2e/offline.spec.ts`) checks every thread at the network level.
 
@@ -40,17 +40,17 @@ npm run dev          # http://localhost:5173
 npm run build && npm start   # production build served with vite preview
 ```
 
-`predev`/`prebuild` copy the self-hosted runtime assets (ONNX runtime wasm, Tesseract worker and cores, and the English language data if missing) into `public/`.
+`build` copies the self-hosted runtime assets (ONNX runtime wasm, Tesseract worker and cores, and the English language data if missing) into `public/`.
 
 ### Tests
 
 ```bash
-npm test                                   # 37 unit tests (dHash, Luhn, redaction, RRF, BM25, clock, chunker, blocks, engine)
-CHROME_PATH=/path/to/chrome npm run test:e2e   # 15 Playwright tests (needs network for the first model download)
+npm test                                   # 44 unit tests (dHash, Luhn, redaction, RRF, BM25, clock, chunker, blocks, engine)
+CHROME_PATH=/path/to/chrome npm run test:e2e   # 20 Playwright tests (needs network for the first model download)
 npm run build:demo                         # regenerate public/demo with the real pipeline (needs a running preview on :4173)
 ```
 
-The e2e suite drives the real app in Chromium with `--use-fake-ui-for-media-stream`, a fake microphone fed from a speech clip, and a canvas stream standing in for the screen (see "What was and wasn't verified").
+The e2e suite drives the real app in Chromium with `--use-fake-ui-for-media-stream`, and a canvas stream standing in for the screen (see "What was and wasn't verified").
 
 ## Model and asset sizes
 
@@ -59,25 +59,25 @@ The e2e suite drives the real app in Chromium with `--use-fake-ui-for-media-stre
 | CLIP ViT-B/32 vision, q8 | 89.1 MB | Hugging Face CDN, once, then Cache Storage |
 | CLIP ViT-B/32 text, q8 | 64.5 MB | same |
 | CLIP tokenizer + config | 2.2 MB | same |
-| Whisper tiny.en, q8 (voice only) | ~43.5 MB | same, only if voice is enabled |
 | ONNX runtime wasm (4 variants shipped, 1 used) | 83 MB on disk, ~27 MB fetched | this site |
 | Tesseract worker + cores + English data | ~15 MB on disk, ~6 MB fetched | this site |
 
-Total first-run download: about 155 MB (about 200 MB with voice).
+Total first-run download: about 155 MB.
 
 ## Architecture
 
 ```
 src/capture   getDisplayMedia, session recorder, capture worker (MediaStreamTrackProcessor → sample → dHash dedupe), fallback sampler, importer
-src/workers   index.worker (OCR → redact → CLIP → label → WebP → IDB), search.worker, audio.worker (VAD → Whisper), typed RPC clients
+src/workers   index.worker (OCR → redact → CLIP → label → WebP → IDB), search.worker, typed RPC clients
 src/models    CLIP (transformers.js), Tesseract.js, progress aggregation
 src/privacy   redaction (Luhn, regexes, label rules, block-list), network audit
 src/search    BM25 (prefix + typo), RRF, brute-force cosine, engine
 src/store     IndexedDB (idb), demo import
 src/timeline  block segmentation and labelling
-src/audio     energy VAD + chunker, AudioWorklet tap
+src/model     trainable classifier head (logistic regression on CLIP embeddings), trainer, holdout evaluation
+src/offline   service worker client, readiness, simulated airplane mode
 src/eval      labelled queries, metrics, benchmark runner
-src/ui        Record, Search, Timeline, Privacy, Benchmark
+src/ui        Overview, Record, Search, Timeline, Ask AI, Airplane mode, Privacy, Benchmark
 ```
 
 Notable details: the screen track is read on a worker via a `MediaStreamTrackProcessor` created on the main thread and its `readable` transferred (tracks are not transferable in stable Chrome); the dHash (9×8 box-resized grayscale, 64-bit) and a coarse 32×18 change grid are implemented from scratch; ONNX runtime runs single-threaded wasm (`numThreads = 1`) so no `SharedArrayBuffer` or cross-origin isolation is needed; WebGPU is tried first when an adapter exists and falls back to wasm.
@@ -98,15 +98,32 @@ Pipeline: median 0.67 s to index a frame (OCR + redact + CLIP + encode), median 
 
 **Read these numbers with care:** the corpus is 14 synthetic screens and I wrote the queries, so absolute values are optimistic and a bigger, messier corpus will score lower. The relative result (fused beats either signal) is the useful part.
 
+## Trainable head results
+
+Measured in headless Chromium on the shipped 70-frame synthetic pack (14 apps x 5 looks), 40% held out, 8 random splits (`docs/head-benchmark.json`):
+
+| Held-out accuracy | Zero-shot | Trained head |
+|---|---|---|
+| Same apps return | 70.1% | 81.3% |
+| Whole apps never seen | 72.1% | 62.9% |
+
+Learning curve (same apps): 70% at 0 corrections, 76% at 16, 85% at 32. The pack is synthetic, the hyperparameters were tuned while looking at it, and splits are small and noisy (64% to 93% per split), so the gain is optimistic and the new-apps regression is real. Re-run it on your own corrected frames on the Benchmark page.
+
+## Offline
+
+`public/sw.js` is registered in production builds. It caches same-origin GETs (cache-first) plus a build-time `precache.json`, falls back to the cached shell for navigations, and the models live in Cache Storage (`transformers-cache`). The Airplane mode page checks all three, can simulate airplane mode by making the worker refuse every request (labelled as simulated), and `e2e/offline.spec.ts` also cuts the real browser network, cold-reloads and searches. Not covered offline: the optional Gemini analysis.
+
 ## What was and wasn't verified
 
-Verified by automated tests: the capture worker path (processor and fallback), dedupe, session clock, OCR + CLIP indexing, hybrid search, visible redaction (card, email, phone, password, CVC pixels changed; untouched text unchanged; digits absent from stored text), block-list frame drop, timeline blocks, benchmark export, voice (fake mic fed a speech clip → transcript → speech-signal search aligned to frames), permission denied, user stopping the share, index worker crash recovery, reload mid-recording, unsupported-browser message, zero external requests after models are cached, and no serious axe-core violations on any tab in light and dark.
+Verified by automated tests: the capture worker path (processor and fallback), dedupe, session clock, OCR + CLIP indexing, hybrid search, visible redaction (card, email, phone, password, CVC pixels changed; untouched text unchanged; digits absent from stored text), block-list frame drop, timeline blocks, benchmark export, timeline correction → on-device retrain → persisted head, a real-network-off cold reload followed by a search (service worker), permission denied, user stopping the share, index worker crash recovery, reload mid-recording, unsupported-browser message, zero external requests after models are cached, and no serious axe-core violations on any tab in light and dark.
 
 Not verified: capturing a real desktop (headless Chromium has no screen, so a canvas stream stands in; Xvfb capture failed to start the video source), the WebGPU path (no GPU available, wasm only), Firefox and Safari, the Picture-in-Picture mini recorder (needs a real window), storage-quota eviction under real pressure, and running two recording tabs at once.
 
 ## Known limitations
 
-- English only for OCR and speech. Whisper tiny.en is fast but makes mistakes.
+- English only for OCR.
+- The trained head helps on apps you have corrected and can hurt on apps it has never seen (see below).
+- An experimental voice feature exists behind `?exp=audio`; it is hidden and not part of the product.
 - Zero-shot labels are coarse; the timeline labels are only as good as CLIP and OCR.
 - Redaction misses anything OCR misses (see Privacy model).
 - First load downloads about 155 MB and needs a modern machine; indexing is single-threaded wasm.

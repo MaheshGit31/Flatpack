@@ -22,7 +22,7 @@ export function ConsentModal({ onAccept, onCancel, audio }: { onAccept: () => vo
         )}
         {!audio && <ul>
           <li>Flatpak takes a snapshot of the screen you choose about every 3 seconds.</li>
-          <li>Everything is processed and stored <b>only in this browser</b> (IndexedDB). Nothing is uploaded.</li>
+          <li>Everything is processed and stored <b>only in this browser</b> (private, on your device). Nothing is uploaded.</li>
           <li>Card numbers, emails, phone numbers and secrets are blurred <b>before</b> a frame is saved. The original is discarded.</li>
           <li>A recording indicator stays visible in the page and tab title. Pause any time with Alt+Shift+P.</li>
         </ul>}

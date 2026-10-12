@@ -4,8 +4,10 @@ import { SearchPage } from './Search';
 import { TimelinePage } from './Timeline';
 import { PrivacyPage } from './Privacy';
 import { BenchmarkPage } from './Benchmark';
-import { Overview } from './Overview';
+import { Home } from './Home';
 import { AskPage } from './Ask';
+import { OfflinePage } from './Offline';
+import { useNetwork } from '../offline/sw';
 import { Landing } from './Landing';
 import { APP_PAGES, href, useRoute, type AppPage } from './router';
 import { closeStaleSessions, expireOld, getSettings } from '../store/db';
@@ -14,19 +16,29 @@ import { recorder } from '../capture/recorder';
 import { useRecorder } from './useRecorder';
 
 const META: Record<AppPage, { label: string; title: string; blurb: string; icon: ReactNode }> = {
-  overview: { label: 'Overview', title: 'Overview', blurb: 'What Flatpak is holding for you right now, and what it can do next.', icon: <path d="M4 5h7v7H4zM13 5h7v4h-7zM13 11h7v8h-7zM4 14h7v5H4z" /> },
-  record: { label: 'Record', title: 'Record', blurb: "Pick a screen or window. Flatpak keeps what changed, blurs what's sensitive, and forgets the rest.", icon: <><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" /></> },
-  search: { label: 'Search', title: 'Search', blurb: 'Describe what you remember, or quote the words on the screen. Visual and text matches are fused.', icon: <><circle cx="11" cy="11" r="6" /><path d="m20 20-4.2-4.2" /></> },
-  timeline: { label: 'Timeline', title: 'Timeline', blurb: "Your screen time, split into blocks by gaps and by how far the screen's meaning drifts.", icon: <path d="M5 4v16M5 7h9M5 12h14M5 17h7" /> },
+  overview: { label: 'Home', title: 'Flatpak', blurb: "Find anything you've seen on your screen. Stays on your device.", icon: <path d="M4 5h7v7H4zM13 5h7v4h-7zM13 11h7v8h-7zM4 14h7v5H4z" /> },
+  record: { label: 'Recording', title: 'Recording', blurb: "Pick a screen or window. Flatpak keeps what changed, blurs what's sensitive, and forgets the rest.", icon: <><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" /></> },
+  search: { label: 'Search', title: 'Search', blurb: 'Describe what you remember, or type words you saw.', icon: <><circle cx="11" cy="11" r="6" /><path d="m20 20-4.2-4.2" /></> },
+  timeline: { label: 'Your day', title: 'Your day', blurb: 'What you were doing, in order.', icon: <path d="M5 4v16M5 7h9M5 12h14M5 17h7" /> },
   ask: { label: 'Ask AI', title: 'Ask AI', blurb: 'Optional. Bring your own Gemini key to analyze frames and ask questions about what you saw.', icon: <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM18 16l.8 2.2L21 19l-2.2.8L18 22l-.8-2.2L15 19l2.2-.8z" /> },
   privacy: { label: 'Privacy & data', title: 'Privacy & data', blurb: 'What happens to every frame, what leaves this browser (nothing, unless you say so), and how to erase it.', icon: <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z" /> },
-  benchmark: { label: 'Benchmark', title: 'Benchmark', blurb: 'Labelled queries over the demo screens, run on this device with the real models.', icon: <path d="M5 20V10M12 20V4M19 20v-7" /> },
+  offline: { label: 'Airplane mode', title: 'Airplane mode', blurb: 'Cache the app and the models once, then switch the network off. Search and classification keep working.', icon: <path d="M21 15v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V8l-8 5v2l8-2.5V18l-2 1.5V21l3.5-1 3.5 1v-1.5L13 18v-5.5z" /> },
+  benchmark: { label: 'Accuracy test', title: 'Accuracy test', blurb: 'Advanced. Measures how well search and labels work on this device.', icon: <path d="M5 20V10M12 20V4M19 20v-7" /> },
 };
+
+const MAIN: AppPage[] = ['overview', 'search', 'timeline'];
+const ADV: AppPage[] = APP_PAGES.filter((p) => !MAIN.includes(p));
+const navLink = (p: AppPage, page: AppPage) => (
+  <a key={p} href={href(p)} aria-current={page === p ? 'page' : undefined}>
+    <svg viewBox="0 0 24 24" aria-hidden>{META[p].icon}</svg>{META[p].label}
+  </a>
+);
 
 function Dashboard({ page }: { page: AppPage }) {
   const rec = useRecorder();
   const [pip, setPip] = useState<Window | null>(null);
   const [quota, setQuota] = useState<number | null>(null);
+  const net = useNetwork();
   const live = rec.phase === 'recording' || rec.phase === 'paused';
   const m = META[page];
   useEffect(() => {
@@ -44,18 +56,18 @@ function Dashboard({ page }: { page: AppPage }) {
       <aside className="side">
         <a className="brand" href="#/"><span className="logo" aria-hidden />Flatpak</a>
         <nav aria-label="Main">
-          {APP_PAGES.map((p) => (
-            <a key={p} href={href(p)} aria-current={page === p ? 'page' : undefined}>
-              <svg viewBox="0 0 24 24" aria-hidden>{META[p].icon}</svg>{META[p].label}
-            </a>
-          ))}
+          {MAIN.map((p) => navLink(p, page))}
+          <details className="adv" open={ADV.includes(page)}>
+            <summary>Advanced</summary>
+            {ADV.map((p) => navLink(p, page))}
+          </details>
         </nav>
         <div className="spacer" />
         <div className="side-foot">Everything stays in this browser.<br /><a href="#/">Back to home</a></div>
       </aside>
       <div className="main">
         <div className="topbar">
-          {live ? <span className={'rec-pill' + (rec.phase === 'paused' ? ' paused' : '')} role="status"><b aria-hidden />{rec.phase === 'paused' ? 'PAUSED' : 'REC'}</span> : <span className="muted" style={{ fontSize: 'var(--t-sm)' }}><span className="status-dot on" aria-hidden />On device · no uploads</span>}
+          {live ? <span className={'rec-pill' + (rec.phase === 'paused' ? ' paused' : '')} role="status"><b aria-hidden />{rec.phase === 'paused' ? 'PAUSED' : 'REC'}</span> : <span className="muted" style={{ fontSize: 'var(--t-sm)' }}><span className={'status-dot' + (net.online ? ' on' : ' off')} aria-hidden />{net.online ? 'On device · no uploads · Network: online' : 'Network: offline, still working'}</span>}
           <div className="grow" />
           {live && 'documentPictureInPicture' in window && !pip && <button className="btn" onClick={() => void openMini().then((w) => { if (w) { w.addEventListener('pagehide', () => setPip(null)); setPip(w); } })}>Mini recorder</button>}
           <ThemeButton />
@@ -64,12 +76,13 @@ function Dashboard({ page }: { page: AppPage }) {
         {quota !== null && quota > 0.8 && <div className="notice err" role="alert" style={{ margin: '16px 32px 0' }}>Browser storage is {(quota * 100).toFixed(0)}% full. Flatpak will drop its oldest frames when it runs out. Delete old sessions in Privacy &amp; data.</div>}
         <main className="content">
           <header className="page-head"><h1>{m.title}</h1><p>{m.blurb}</p></header>
-          {page === 'overview' && <Overview />}
+          {page === 'overview' && <Home />}
           {page === 'record' && <Record />}
           {page === 'search' && <SearchPage />}
           {page === 'timeline' && <TimelinePage />}
           {page === 'ask' && <AskPage />}
           {page === 'privacy' && <PrivacyPage />}
+          {page === 'offline' && <OfflinePage />}
           {page === 'benchmark' && <BenchmarkPage />}
         </main>
       </div>

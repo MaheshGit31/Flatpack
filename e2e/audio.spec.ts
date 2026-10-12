@@ -12,7 +12,7 @@ test('voice memory: mic → VAD → Whisper → text-only transcript, searchable
     setInterval(() => { g.fillStyle = n % 2 ? '#fff' : '#223'; g.fillRect(0, 0, 1280, 720); g.fillStyle = '#c33'; g.font = '60px sans-serif'; g.fillText('meeting notes ' + n, 80, 200 + (n % 5) * 90); n++; }, 100);
     navigator.mediaDevices.getDisplayMedia = async () => c.captureStream(10);
   });
-  await page.goto('/#/app/record');
+  await page.goto('/?exp=audio#/app/record');
   await page.getByLabel(/Transcribe speech locally/).check();
   await page.getByLabel('Microphone').check();
   await page.getByRole('button', { name: 'Start recording' }).click();

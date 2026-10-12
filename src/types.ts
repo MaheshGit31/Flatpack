@@ -27,8 +27,10 @@ export interface FrameRec {
   wall: number; // wall clock ms
   w: number;
   h: number;
-  activity: ActivityLabel;
+  activity: ActivityLabel; // what the current classifier says (trained head if one exists, else zero-shot); equals userActivity when the user corrected it
   activityConf: number;
+  zsActivity?: ActivityLabel; // pure zero-shot label at index time
+  userActivity?: ActivityLabel; // set when the user corrected a Timeline block: the training signal
   hasText: boolean;
   redactions: number;
   fullBytes: number;
